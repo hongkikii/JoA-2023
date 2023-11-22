@@ -1,8 +1,8 @@
 package com.mjuAppSW.joA.domain.report.message.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.antlr.v4.runtime.misc.NotNull;
 
 @Data
 public class ReportRequest {
