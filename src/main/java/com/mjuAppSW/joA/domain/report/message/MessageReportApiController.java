@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,8 +28,13 @@ public class MessageReportApiController {
             log.info("messageReport Return : OK, success to report");
             return HttpStatus.OK;
         }
-        log.warn("messageReport Return : BAD_REQUEST, getValue's not correct");
-        log.warn("messageReport : messageId = {}, categoryId = {}", request.getMessageId(), request.getCategoryId());
+        log.warn("messageReport Return : BAD_REQUEST, getValue's not correct / messageId = {}, categoryId = {}", request.getMessageId(), request.getCategoryId());
         return HttpStatus.BAD_REQUEST;
+    }
+
+    @PostMapping("/report/admin/delete")
+    public void deleteMessageReportAdmin(@RequestParam("id") Long id){
+        log.info("deleteMessageReportAdmin : / id = {}", id);
+        messageReportService.deleteMessageReportAdmin(id);
     }
 }

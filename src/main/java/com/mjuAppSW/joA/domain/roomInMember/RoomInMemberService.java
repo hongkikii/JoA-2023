@@ -1,6 +1,7 @@
 package com.mjuAppSW.joA.domain.roomInMember;
 
 import com.mjuAppSW.joA.domain.member.Member;
+import com.mjuAppSW.joA.domain.member.MemberAccessor;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.message.MessageRepository;
 import com.mjuAppSW.joA.domain.message.dto.CurrentMessageInfo;
@@ -29,16 +30,18 @@ public class RoomInMemberService {
     private RoomRepository roomRepository;
     private MemberRepository memberRepository;
     private MessageRepository messageRepository;
+    private MemberAccessor memberAccessor;
 
     @Autowired
     public RoomInMemberService(RoomInMemberRepository roomInMemberRepository, RoomService roomService,
                                MemberRepository memberRepository, RoomRepository roomRepository,
-                               MessageRepository messageRepository){
+                               MessageRepository messageRepository, MemberAccessor memberAccessor){
         this.roomInMemberRepository = roomInMemberRepository;
         this.roomService = roomService;
         this.memberRepository = memberRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
+        this.memberAccessor = memberAccessor;
     }
 
     public String decrypt(String cipherText, String encryptionKey){
@@ -86,6 +89,7 @@ public class RoomInMemberService {
     public RoomListVO getRoomList(Long memberId) {
         Member member = memberRepository.findBysessionId(memberId).orElse(null);
         if(member != null){
+            if(memberAccessor.isStopped(member.getSessionId())){return new RoomListVO(null, "3");}
             List<RoomInMember> memberList = roomInMemberRepository.findByAllMember(member);
             List<RoomInfoVO> roomInfoCIsNullList = new ArrayList<>();
             List<RoomInfoVO> roomInfoCIsNotNullList = new ArrayList<>();

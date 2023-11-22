@@ -162,8 +162,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             }else if(checkTime == 7){
                 log.info("checkTime over 7days : roomId = {}", roomId);
             }else{
-                log.warn("checkTime : getValue's not correct");
-                log.warn("checkTime : roomId = {}", roomId);
+                log.warn("checkTime : getValue's not correct / roomId = {}", roomId);
                 alarmMessage = "방 정보가 유효하지 않습니다.";
             }
             sendExceptionMessage(roomId, session, alarmMessage);

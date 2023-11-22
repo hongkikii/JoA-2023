@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -32,10 +33,10 @@ public class MessageReport {
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private LocalDateTime date;
 
     @Builder
-    public MessageReport(Message message_id, ReportCategory category_id, String content, Date date) {
+    public MessageReport(Message message_id, ReportCategory category_id, String content, LocalDateTime date) {
         this.message_id = message_id;
         this.category_id = category_id;
         this.content = content;
