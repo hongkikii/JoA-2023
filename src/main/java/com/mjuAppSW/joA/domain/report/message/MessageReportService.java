@@ -35,6 +35,8 @@ public class MessageReportService {
     public boolean messageReport(Long messageId, Long categoryId, String content){
         Message message = messageRepository.findById(messageId).orElse(null);
         ReportCategory reportCategory = reportCategoryRepository.findById(categoryId).orElse(null);
+        MessageReport check = messageReportRepository.findByMessage(message);
+        if(check != null){return false;}
         if(message != null && reportCategory != null){
             MessageReport messageReport = MessageReport.builder()
                     .message_id(message)
