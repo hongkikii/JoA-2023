@@ -28,7 +28,11 @@ public class RoomInMemberApiController {
         if(response.getStatus().equals("0") || response.getStatus().equals("1")){
             log.info("getRoomList Return : OK");
             return ResponseEntity.ok(response.getRoomDTOList());
-        }else{
+        }else if(response.getStatus().equals("3")){
+            log.warn("getRoomList Return : BAD_REQUEST, member id is not valid / memberId = {}", memberId);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else{
             log.warn("getRoomList Return : BAD_REQUEST, roomId's not correct / memberId = {}", memberId);
             return ResponseEntity.badRequest().build();
         }
