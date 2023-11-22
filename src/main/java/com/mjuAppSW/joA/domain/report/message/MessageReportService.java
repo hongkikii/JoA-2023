@@ -65,7 +65,7 @@ public class MessageReportService {
         return hours;
     }
 
-    @Scheduled(cron = "55 23 1,15 * *")
+    @Scheduled(cron = "0 55 23 14,L * ?")
     public void deleteMessageReport(){
         log.info("23:55 1 or 15, deleteMessageReport");
         List<MessageReport> messageReports = messageReportRepository.findAll();
