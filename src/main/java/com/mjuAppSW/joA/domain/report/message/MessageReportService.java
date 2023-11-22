@@ -32,11 +32,11 @@ public class MessageReportService {
         this.reportCategoryRepository = reportCategoryRepository;
     }
 
-    public boolean messageReport(Long messageId, Long categoryId, String content){
+    public String messageReport(Long messageId, Long categoryId, String content){
         Message message = messageRepository.findById(messageId).orElse(null);
         ReportCategory reportCategory = reportCategoryRepository.findById(categoryId).orElse(null);
         MessageReport check = messageReportRepository.findByMessage(message);
-        if(check != null){return false;}
+        if(check != null){return "2";}
         if(message != null && reportCategory != null){
             MessageReport messageReport = MessageReport.builder()
                     .message_id(message)
@@ -45,9 +45,9 @@ public class MessageReportService {
                     .date(LocalDateTime.now())
                     .build();
             MessageReport saveMessageReport = messageReportRepository.save(messageReport);
-            if(saveMessageReport != null) return true;
+            if(saveMessageReport != null) return "0";
         }
-        return false;
+        return "1";
     }
 
     public void deleteMessageReportAdmin(Long id){
