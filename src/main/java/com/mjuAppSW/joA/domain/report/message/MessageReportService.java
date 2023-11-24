@@ -5,6 +5,9 @@ import com.mjuAppSW.joA.domain.message.Message;
 import com.mjuAppSW.joA.domain.message.MessageRepository;
 import com.mjuAppSW.joA.domain.report.ReportCategory;
 import com.mjuAppSW.joA.domain.report.ReportCategoryRepository;
+import com.mjuAppSW.joA.domain.room.Room;
+import com.mjuAppSW.joA.domain.roomInMember.RoomInMember;
+import com.mjuAppSW.joA.domain.roomInMember.RoomInMemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -23,13 +24,15 @@ public class MessageReportService {
     private MessageReportRepository messageReportRepository;
     private MessageRepository messageRepository;
     private ReportCategoryRepository reportCategoryRepository;
+    private RoomInMemberRepository roomInMemberRepository;
 
     @Autowired
     public MessageReportService(MessageReportRepository message_report_repository, MessageRepository messageRepository,
-                                ReportCategoryRepository reportCategoryRepository){
+                                ReportCategoryRepository reportCategoryRepository, RoomInMemberRepository roomInMemberRepository){
         this.messageReportRepository = message_report_repository;
         this.messageRepository = messageRepository;
         this.reportCategoryRepository = reportCategoryRepository;
+        this.roomInMemberRepository = roomInMemberRepository;
     }
 
     public String messageReport(Long messageId, Long categoryId, String content){
@@ -48,6 +51,28 @@ public class MessageReportService {
             if(saveMessageReport != null) return "0";
         }
         return "1";
+    }
+
+    public Boolean checkMessageReport(Long memberId1, Long memberId2){
+        List<MessageReport> messageReports = messageReportRepository.findByMemberId(memberId1, memberId2);
+        Set<Room> roomIds = new HashSet<>();
+        if(messageReports != null){
+            for(MessageReport mr : messageReports){
+                roomIds.add(mr.getMessage_id().getRoom());
+            }
+
+            for(Room rId : roomIds){
+                List<RoomInMember> roomInMembers = roomInMemberRepository.findByAllRoom(rId);
+                boolean memberId1Exists = roomInMembers.stream()
+                        .anyMatch(rim -> rim.getMember().getId().equals(memberId1));
+                boolean memberId2Exists = roomInMembers.stream()
+                        .anyMatch(rim -> rim.getMember().getId().equals(memberId2));
+                if(memberId1Exists && memberId2Exists){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void deleteMessageReportAdmin(Long id){
