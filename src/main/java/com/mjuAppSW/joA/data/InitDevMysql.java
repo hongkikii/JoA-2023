@@ -17,7 +17,7 @@ import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
-@Profile("prod")
+@Profile("dev")
 public class InitDevMysql {
 
     private final InitService initService;
