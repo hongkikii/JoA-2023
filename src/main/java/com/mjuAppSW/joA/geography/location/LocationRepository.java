@@ -17,6 +17,9 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
             "AND l.member_id <> :memberId " +
             "AND l.college_id = :collegeId " +
             "AND l.is_contained = true " +
+            "AND NOT EXISTS (SELECT 1 FROM block b " +
+            "                WHERE (b.blocker_id = l.member_id AND b.blocked_id = :memberId) " +
+            "                   OR (b.blocker_id = :memberId AND b.blocked_id = l.member_id)) " +
             "ORDER BY ST_Distance(l.Member_point, :point) " +
             "LIMIT 50", nativeQuery = true)
     List<Long> findNearIds(@Param("memberId") Long memberId, @Param("point") Point point, @Param("collegeId") Long collegeId);

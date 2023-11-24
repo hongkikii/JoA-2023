@@ -1,5 +1,6 @@
-package com.mjuAppSW.joA.domain.member;
+package com.mjuAppSW.joA.geography.block;
 
+import com.mjuAppSW.joA.geography.location.Location;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,9 +21,14 @@ public class Block {
 
     @ManyToOne
     @JoinColumn(name = "blocker_id")
-    private Member blocker;
+    private Location blocker;
 
     @ManyToOne
     @JoinColumn(name = "blocked_id")
-    private Member blocked;
+    private Location blocked;
+
+    public Block(Location blocker, Location blocked) {
+        this.blocker = blocker;
+        this.blocked = blocked;
+    }
 }
