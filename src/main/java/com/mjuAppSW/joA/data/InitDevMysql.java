@@ -17,7 +17,7 @@ import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
-@Profile("dev")
+@Profile("prod")
 public class InitDevMysql {
 
     private final InitService initService;
@@ -91,43 +91,43 @@ public class InitDevMysql {
             member1 = new Member( "최가의", "god11",
                     "$2a$10$0wosqw60V4BqMC55UDBtjOcAapLBqsRVhXYC5TV29Iy8AZxynbIrC",
                     "$2a$10$0wosqw60V4BqMC55UDBtjO",
-                    "god", c1, 3021485742L);
+                    "god", c1, null);
             member2 = new Member("한요한", "han22",
                     "$2a$10$yW8qjeUJVrJDouyT2yLAUe7eP3RiXNoTHgDJGY0XX58LHfXX9nHya",
                     "$2a$10$yW8qjeUJVrJDouyT2yLAUe",
-                    "hyh", c1, 8920361728L);
+                    "hyh", c1, null);
             member3 = new Member("한태산", "san33",
                     "$2a$10$S4Q9Wy1AZ6vQDGt.2vyQ9uzQYH6tsf8agBXMhck1EAKYy.ajvqrVW",
                     "$2a$10$S4Q9Wy1AZ6vQDGt.2vyQ9u",
-                    "hts", c1,5830182736L);
+                    "hts", c1,null);
             member4 = new Member("홍향미", "hong44",
                     "$2a$10$BvwjtS.cm3Zmm3JIyjHDd.Xe29nOCkBThflGO0zQa0yMMoaL/HUmW",
                     "$2a$10$BvwjtS.cm3Zmm3JIyjHDd.",
-                    "hong", c1, 1029364726L);
+                    "hong", c1, null);
             member5 = new Member("최종현", "choi55",
                     "$2a$10$E/Ixrfm2UC1ltbkhzfgFPOFC5I0kDVrbMpyUrX3.iowUcKCPTJ9Ue",
                     "$2a$10$E/Ixrfm2UC1ltbkhzfgFPO",
-                    "cjh", c1, 1035672937L);
+                    "cjh", c1, null);
             member6 = new Member("강남순", "soon66",
                     "$2a$10$MCY7f8Ri73H85Y951DjxP.LPgbcpoW2ZnjaOU..2eL/XJ3xEbXrEi",
                     "$2a$10$MCY7f8Ri73H85Y951DjxP.",
-                    "kns", c1, 1928344253L);
+                    "kns", c1, null);
             member7 = new Member("백승호", "hoo77",
                     "$2a$10$OdpYryOjnWysN3/YGrSUJ.iiG1aVHtavmdj2a9Y0sqYWoMJkeaN1e",
                     "$2a$10$OdpYryOjnWysN3/YGrSUJ.",
-                    "psh", c1, 1927355572L);
+                    "psh", c1, null);
             member8 = new Member("이강인", "lee88",
                     "$2a$10$RTkmfOspvEU/EB73idrL9ePo5UtX4AYufFCz6xDeuDY5rkOlbXqd6",
                     "$2a$10$RTkmfOspvEU/EB73idrL9e",
-                    "lki", c1, 2938654378L);
+                    "lki", c1, null);
             member9 = new Member("전정국", "kook99",
                     "$2a$10$Nvfd21BNo15MapBXmaFCAelmKf6Qk4eZhBCIVF8uxBvDvMVCBTmj6",
                     "$2a$10$Nvfd21BNo15MapBXmaFCAe",
-                    "jjk", c1, 7920174337L);
+                    "jjk", c1, null);
             member10 = new Member("안효섭", "ann1010",
                     "$2a$10$kTJ0m6ot/voRe5JzR.9GZeaHd32AOnyhY4Sgcltl3WXrNkBxi7vd.",
                     "$2a$10$kTJ0m6ot/voRe5JzR.9GZe",
-                    "ahs", c1, 3276518263L);
+                    "ahs", c1, null);
 
             em.persist(member1);
             em.persist(member2);
