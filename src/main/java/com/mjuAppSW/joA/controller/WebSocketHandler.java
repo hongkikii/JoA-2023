@@ -39,19 +39,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private RoomRepository roomRepository;
     private MemberRepository memberRepository;
     private RoomService roomService;
-    private MessageReportRepository messageReportRepository;
 
     @Autowired
     public WebSocketHandler(RoomInMemberService roomInMemberService, MessageService messageService,
                             RoomRepository roomRepository, MemberRepository memberRepository, RoomService roomService,
-                            RoomInMemberRepository roomInMemberRepository, MessageReportRepository messageReportRepository){
+                            RoomInMemberRepository roomInMemberRepository){
         this.roomInMemberService = roomInMemberService;
         this.messageService = messageService;
         this.roomRepository = roomRepository;
         this.memberRepository = memberRepository;
         this.roomService = roomService;
         this.roomInMemberRepository = roomInMemberRepository;
-        this.messageReportRepository = messageReportRepository;
     }
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -76,42 +74,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
         return null;
     }
 
-    public Boolean checkConstraintMakeRoom(Long memberId1, Long memberId2){
-        List<MessageReport> messageReports = messageReportRepository.findByMemberId(memberId1, memberId2);
-        Set<Room> roomIds = new HashSet<>();
-        if(messageReports != null){
-            for(MessageReport mr : messageReports){
-                roomIds.add(mr.getMessage_id().getRoom());
-            }
-
-            for(Room rId : roomIds){
-                List<RoomInMember> roomInMembers = roomInMemberRepository.findByAllRoom(rId);
-                boolean memberId1Exists = roomInMembers.stream()
-                        .anyMatch(rim -> rim.getMember().getId().equals(memberId1));
-                boolean memberId2Exists = roomInMembers.stream()
-                        .anyMatch(rim -> rim.getMember().getId().equals(memberId2));
-                if(memberId1Exists && memberId2Exists){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public void makeRoom(String roomId, String memberId1, String memberId2){
         String memberId = sessionIdToMemberId(memberId1);
 
         Boolean checkRoomId = roomInMemberService.findByRoom(Long.parseLong(roomId));
-        Boolean checkReport = checkConstraintMakeRoom(Long.parseLong(memberId), Long.parseLong(memberId2));
 
         if(checkRoomId){
-            if(checkReport){
-                Boolean room1 = roomInMemberService.createRoom(Long.parseLong(roomId), Long.parseLong(memberId));
-                Boolean room2 = roomInMemberService.createRoom(Long.parseLong(roomId), Long.parseLong(memberId2));
-                if(room1 && room2) {log.info("makeRoom : roomId = {}, memberId1 = {}, memberId2 = {}", roomId, memberId, memberId2);}
-                else{log.warn("makeRoom : getValue's not correct or already exist / roomId = {}, memberId1 = {}, memberId2 = {}", roomId, memberId1, memberId2);}
-            }else log.warn("makeRoom : messageReport's exist / memberId1 = {}, memberId2 = {}", memberId1, memberId2);
-        } else log.warn("makeRoom : getValue's not correct or already exist / roomId = {}", roomId);
+            Boolean room1 = roomInMemberService.createRoom(Long.parseLong(roomId), Long.parseLong(memberId));
+            Boolean room2 = roomInMemberService.createRoom(Long.parseLong(roomId), Long.parseLong(memberId2));
+            if(room1 && room2) {log.info("makeRoom : roomId = {}, memberId1 = {}, memberId2 = {}", roomId, memberId, memberId2);}
+            else{log.warn("makeRoom : getValue's not correct or already exist / roomId = {}, memberId1 = {}, memberId2 = {}", roomId, memberId1, memberId2);}
+        }else log.warn("makeRoom : getValue's not correct or already exist / roomId = {}", roomId);
     }
 
     public void sendMessage(String roomId, String memberId1, String content,
