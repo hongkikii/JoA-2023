@@ -19,6 +19,7 @@ import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
 import static com.mjuAppSW.joA.constant.Constants.FindId;
 import static com.mjuAppSW.joA.constant.Constants.Join;
 import static com.mjuAppSW.joA.constant.Constants.Login.LOGIN_ID_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.constant.Constants.Login.LOGIN_IS_ALREADY;
 import static com.mjuAppSW.joA.constant.Constants.Login.PASSWORD_IS_NOT_EXISTED;
 import static com.mjuAppSW.joA.constant.Constants.Logout.MEMBER_IS_NOT_EXISTED;
 import static com.mjuAppSW.joA.constant.Constants.MAIL.CERTIFY_NUMBER_IS;
@@ -194,9 +195,10 @@ public class MemberServiceImpl implements MemberService{
             return new LoginResponse(LOGIN_ID_IS_NOT_EXISTED);
 
         Long sessionId = findMember.getSessionId();
-        if(isNull(sessionId))
-            findMember.makeSessionId(sessionManager.getSessionId());
+        if (!isNull(sessionId))
+            return new LoginResponse(LOGIN_IS_ALREADY);
 
+        findMember.makeSessionId(sessionManager.getSessionId());
         // 비밀번호 암호화
         String salt = findMember.getSalt();
         String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
