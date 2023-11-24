@@ -1,9 +1,11 @@
 package com.mjuAppSW.joA.domain.report.message;
 
+import com.mjuAppSW.joA.domain.report.message.dto.CheckMessageReportRequest;
 import com.mjuAppSW.joA.domain.report.message.dto.ReportRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +40,19 @@ public class MessageReportApiController {
 
     @PostMapping("/report/admin/delete")
     public void deleteMessageReportAdmin(@RequestParam("id") Long id){
-        log.info("deleteMessageReportAdmin : / id = {}", id);
+        log.info("deleteMessageReportAdmin : id = {}", id);
         messageReportService.deleteMessageReportAdmin(id);
+    }
+
+    @PostMapping("/check/messageReport")
+    public ResponseEntity<String> checkMessageReport(@RequestBody CheckMessageReportRequest request){
+        log.info("checkMessageReport : memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+        Boolean check = messageReportService.checkMessageReport(request.getMemberId1(), request.getMemberId2());
+        if(check) {
+            log.info("checkMessageReport Return : OK, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        log.warn("checkMessageReport Return : BAD_REQUEST, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 }
