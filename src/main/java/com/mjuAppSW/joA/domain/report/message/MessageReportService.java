@@ -1,10 +1,16 @@
 package com.mjuAppSW.joA.domain.report.message;
 
 
+import com.mjuAppSW.joA.domain.member.Member;
+import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.message.Message;
 import com.mjuAppSW.joA.domain.message.MessageRepository;
 import com.mjuAppSW.joA.domain.report.ReportCategory;
 import com.mjuAppSW.joA.domain.report.ReportCategoryRepository;
+import com.mjuAppSW.joA.domain.report.message.dto.StatusResponse;
+import com.mjuAppSW.joA.domain.room.Room;
+import com.mjuAppSW.joA.domain.roomInMember.RoomInMember;
+import com.mjuAppSW.joA.domain.roomInMember.RoomInMemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,9 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -23,13 +27,18 @@ public class MessageReportService {
     private MessageReportRepository messageReportRepository;
     private MessageRepository messageRepository;
     private ReportCategoryRepository reportCategoryRepository;
+    private RoomInMemberRepository roomInMemberRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
     public MessageReportService(MessageReportRepository message_report_repository, MessageRepository messageRepository,
-                                ReportCategoryRepository reportCategoryRepository){
+                                ReportCategoryRepository reportCategoryRepository, RoomInMemberRepository roomInMemberRepository,
+                                MemberRepository memberRepository){
         this.messageReportRepository = message_report_repository;
         this.messageRepository = messageRepository;
         this.reportCategoryRepository = reportCategoryRepository;
+        this.roomInMemberRepository = roomInMemberRepository;
+        this.memberRepository = memberRepository;
     }
 
     public String messageReport(Long messageId, Long categoryId, String content){
@@ -48,6 +57,43 @@ public class MessageReportService {
             if(saveMessageReport != null) return "0";
         }
         return "1";
+    }
+
+    public boolean check(List<MessageReport> messageReports, Long memberId1, Long memberId2){
+        Set<Room> roomIds = new HashSet<>();
+        if(messageReports != null){
+            for(MessageReport mr : messageReports){
+                roomIds.add(mr.getMessage_id().getRoom());
+            }
+        }
+
+        for(Room rId : roomIds){
+            List<RoomInMember> roomInMembers = roomInMemberRepository.findByAllRoom(rId);
+            boolean memberId1Exists = roomInMembers.stream()
+                    .anyMatch(rim -> rim.getMember().getId().equals(memberId1));
+            boolean memberId2Exists = roomInMembers.stream()
+                    .anyMatch(rim -> rim.getMember().getId().equals(memberId2));
+            if(memberId1Exists && memberId2Exists){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public StatusResponse checkMessageReport(Long memberId1, Long memberId2){
+        Member member1 = memberRepository.findBysessionId(memberId1).orElse(null);
+        Member member2 = memberRepository.findById(memberId2).orElse(null);
+        if(member1 != null && member2 != null){
+            List<MessageReport> myMessageReport = messageReportRepository.findByMemberId(member1.getId());
+            List<MessageReport> opponentMessageReport = messageReportRepository.findByMemberId(member2.getId());
+            Boolean reported = check(myMessageReport, member1.getId(), member2.getId());
+            Boolean report = check(opponentMessageReport, member1.getId(), member2.getId());
+            if(reported && report){return new StatusResponse(1);}
+            else if(reported){return new StatusResponse(1);}
+            else if(report){return new StatusResponse(2);}
+            else {return new StatusResponse(3);}
+        }
+        return new StatusResponse(0);
     }
 
     public void deleteMessageReportAdmin(Long id){
