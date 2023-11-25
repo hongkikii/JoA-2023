@@ -28,10 +28,12 @@ public class MemberStatusManager {
     public void check() {
         List<Member> joiningAll = memberRepository.findJoiningAll();
         for (Member member : joiningAll) {
-            if (member.getReportCount() >= 5 && member.getStatus() != 11) {
+            if (member.getReportCount() >= 5 && member.getStatus() != 1 && member.getStatus() != 2
+                    && member.getStatus() != 11 && member.getStatus() != 22) {
                 executeStopPolicy(member, 5);
             }
-            if (member.getReportCount() >= 10 && member.getStatus() != 22) {
+            if (member.getReportCount() >= 10 && member.getStatus() != 1 && member.getStatus() != 2
+                    && member.getStatus() != 22) {
                 executeStopPolicy(member, 10);
             }
             if (member.getReportCount() >= 15) {
