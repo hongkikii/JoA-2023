@@ -213,7 +213,8 @@ public class MemberServiceImpl implements MemberService{
 
         Location location = locationRepository.findById(findMember.getId()).orElse(null);
         if(!isNull(location)) {
-            Location newLocation = new Location(location.getId(), location.getCollege(), location.getPoint(), false);
+            Location newLocation = new Location(location.getId(), location.getCollege(),
+                    location.getPoint(), false, location.getUpdateDate());
             locationRepository.save(newLocation);
         }
         findMember.expireSessionId();
