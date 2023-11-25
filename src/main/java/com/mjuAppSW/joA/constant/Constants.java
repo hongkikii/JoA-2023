@@ -80,6 +80,7 @@ public class Constants {
     public static class Login {
         public static Integer LOGIN_ID_IS_NOT_EXISTED = 1;
         public static Integer PASSWORD_IS_NOT_EXISTED = 2;
+        public static Integer LOGIN_IS_ALREADY = 3;
     }
 
     public static class Logout {

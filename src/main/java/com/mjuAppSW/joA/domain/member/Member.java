@@ -125,4 +125,8 @@ public class Member {
     public void changeStatus(int status) {
         this.status = status;
     }
+
+    public void addReportCount() {
+        this.reportCount++;
+    }
 }
