@@ -1,6 +1,7 @@
 package com.mjuAppSW.joA.domain.member;
 
 import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
+import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.geography.location.LocationRepository;
 import com.mjuAppSW.joA.storage.S3Uploader;
@@ -27,20 +28,20 @@ public class MemberStatusManager {
     public void check() {
         List<Member> joiningAll = memberRepository.findJoiningAll();
         for (Member member : joiningAll) {
-            if (member.getReportCount() == 5 && member.getStatus() == 0) {
-                executeStopPolicy(member, member.getReportCount());
+            if (member.getReportCount() >= 5 && member.getStatus() != 11) {
+                executeStopPolicy(member, 5);
             }
-            if (member.getReportCount() == 10 && member.getStatus() == 11) {
-                executeStopPolicy(member, member.getReportCount());
+            if (member.getReportCount() >= 10 && member.getStatus() != 22) {
+                executeStopPolicy(member, 10);
             }
-            if (member.getReportCount() == 15 && member.getStatus() == 22) {
+            if (member.getReportCount() >= 15) {
                 executeOutPolicy(member);
             }
         }
     }
 
     private void executeStopPolicy(Member member, int reportCount) {
-        if (member.getStopEndDate() == LocalDate.now()) {
+        if (!isNull(member.getStopEndDate()) && member.getStopEndDate() == LocalDate.now()) {
            completeStopPolicy(member, reportCount);
            return;
         }
@@ -69,6 +70,7 @@ public class MemberStatusManager {
             member.changeStatus(22);
             log.info("account stop end : id = {}, reportCount = 10", member.getId());
         }
+        member.deleteStopDate();
     }
 
     private void executeOutPolicy(Member member) {
