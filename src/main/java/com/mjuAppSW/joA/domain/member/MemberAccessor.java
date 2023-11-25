@@ -28,7 +28,7 @@ public class MemberAccessor {
         if (member == null) {
             return false;
         }
-        if (member.getStatus() == 1 && member.getStatus() == 2) {
+        if (member.getStatus() == 1 || member.getStatus() == 2) {
             return true;
         }
         return false;

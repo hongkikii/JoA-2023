@@ -16,7 +16,6 @@ import com.mjuAppSW.joA.domain.vote.VoteRepository;
 import com.mjuAppSW.joA.domain.vote.dto.StatusResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,6 +45,7 @@ public class VoteReportService {
 
         VoteReport voteReport = makeVoteReport(vote, reportCategory, request.getContent());
         voteReportRepository.save(voteReport);
+        vote.changeInvalid();
 
         Member giveMember = memberRepository.findById(vote.getGiveId()).orElse(null);
         if (giveMember != null) {
