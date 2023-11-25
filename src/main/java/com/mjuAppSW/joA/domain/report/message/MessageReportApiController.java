@@ -2,6 +2,7 @@ package com.mjuAppSW.joA.domain.report.message;
 
 import com.mjuAppSW.joA.domain.report.message.dto.CheckMessageReportRequest;
 import com.mjuAppSW.joA.domain.report.message.dto.ReportRequest;
+import com.mjuAppSW.joA.domain.report.message.dto.StatusResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,14 +46,21 @@ public class MessageReportApiController {
     }
 
     @PostMapping("/check/messageReport")
-    public ResponseEntity<String> checkMessageReport(@RequestBody CheckMessageReportRequest request){
+    public ResponseEntity<StatusResponse> checkMessageReport(@RequestBody CheckMessageReportRequest request){
         log.info("checkMessageReport : memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
-        Boolean check = messageReportService.checkMessageReport(request.getMemberId1(), request.getMemberId2());
-        if(check) {
-            log.info("checkMessageReport Return : OK, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
-            return new ResponseEntity(HttpStatus.OK);
+        StatusResponse check = messageReportService.checkMessageReport(request.getMemberId1(), request.getMemberId2());
+        if(check.getStatus() == 0){
+            log.warn("checkMessageReport Return : BAD_REQUEST, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+            return ResponseEntity.ok(check);
         }
-        log.warn("checkMessageReport Return : BAD_REQUEST, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        else if(check.getStatus() == 1){
+            log.info("checkMessageReport Return : BAD_REQUEST Reported, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+            return ResponseEntity.ok(check);
+        }else if(check.getStatus() == 2){
+            log.info("checkMessageReport Return : BAD_REQUEST Report, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+            return ResponseEntity.ok(check);
+        }
+        log.info("checkMessageReport Return : OK, memberId1 = {}, memberId2 = {}", request.getMemberId1(), request.getMemberId2());
+        return ResponseEntity.ok(check);
     }
 }
