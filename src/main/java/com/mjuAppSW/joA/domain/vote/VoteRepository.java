@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface VoteRepository extends JpaRepository<Vote, Long> {
-    @Query("SELECT vc.name FROM Vote v JOIN v.voteCategory vc WHERE v.member.id = :id GROUP BY vc.name ORDER BY COUNT(vc.name) DESC")
+    @Query("SELECT vc.name FROM Vote v JOIN v.voteCategory vc WHERE v.member.id = :id AND v.isValid = true GROUP BY vc.name ORDER BY COUNT(vc.name) DESC")
     List<String> findVoteCategoryById(@Param("id") Long id, Pageable pageable);
 
     @Query("SELECT v FROM Vote v WHERE v.giveId = :giveId AND v.member.id = :takeId AND v.voteCategory.id = :categoryId AND v.date = :today")
