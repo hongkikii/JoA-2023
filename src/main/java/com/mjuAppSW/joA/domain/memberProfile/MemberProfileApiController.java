@@ -29,12 +29,9 @@ public class MemberProfileApiController {
     public ResponseEntity<SetResponse> set(@RequestParam Long id) {
         log.info("set : id = {}", id);
         SetResponse response = setService.set(id);
-        if (response != null) {
-            log.info("set Return : OK, name = {}, urlCode = {}", response.getName(), response.getUrlCode());
-            return ResponseEntity.ok(response);
-        }
-        log.warn("set Return : BAD_REQUEST, member id is not valid");
-        return ResponseEntity.badRequest().build();
+        log.info("set Return : OK, status = {}, name = {}, urlCode = {}",
+                response.getStatus(), response.getName(), response.getUrlCode());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/set/myPage")
