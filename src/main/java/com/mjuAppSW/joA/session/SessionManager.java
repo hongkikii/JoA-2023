@@ -17,7 +17,7 @@ public class SessionManager {
 
     private final MemberRepository memberRepository;
 
-    public long getSessionId() {
+    public long makeSessionId() {
         long min = 1000000000L;
         long max = 9999999999L;
         return ThreadLocalRandom.current().nextLong(min, max + 1);
@@ -34,7 +34,7 @@ public class SessionManager {
     public void expiredSessionId() {
         List<Member> members = memberRepository.findAll();
         for (Member member : members) {
-            member.makeSessionId(getSessionId());
+            member.makeSessionId(makeSessionId());
         }
     }
 }

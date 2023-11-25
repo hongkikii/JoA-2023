@@ -95,7 +95,7 @@ public class MemberServiceImpl implements MemberService{
         if(isUsingMail(eMail))
             return new UMailResponse(MAIL_IS_USING);
 
-        long sessionId = sessionManager.getSessionId();
+        long sessionId = sessionManager.makeSessionId();
         String certifyNum = cacheCertifyNumAndEmail(sessionId, eMail);
         sendCertifyNumMail(request.getUEmail(), college.getDomain(), certifyNum);
         return new UMailResponse(NORMAL_OPERATION, sessionId);
@@ -194,11 +194,7 @@ public class MemberServiceImpl implements MemberService{
         if (isNull(findMember))
             return new LoginResponse(LOGIN_ID_IS_NOT_EXISTED);
 
-        Long sessionId = findMember.getSessionId();
-        if (!isNull(sessionId))
-            return new LoginResponse(LOGIN_IS_ALREADY);
-
-        findMember.makeSessionId(sessionManager.getSessionId());
+        findMember.makeSessionId(sessionManager.makeSessionId());
         // 비밀번호 암호화
         String salt = findMember.getSalt();
         String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);

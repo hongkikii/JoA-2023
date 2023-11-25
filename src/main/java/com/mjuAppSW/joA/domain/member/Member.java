@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
-import java.util.Date;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -128,5 +127,10 @@ public class Member {
 
     public void addReportCount() {
         this.reportCount++;
+    }
+
+    public void deleteStopDate() {
+        this.stopStartDate = null;
+        this.stopEndDate = null;
     }
 }
