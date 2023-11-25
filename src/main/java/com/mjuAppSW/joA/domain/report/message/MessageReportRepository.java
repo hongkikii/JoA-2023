@@ -15,6 +15,6 @@ public interface MessageReportRepository extends JpaRepository<MessageReport, Lo
     @Query("SELECT mr FROM MessageReport mr Where mr.message_id = :message")
     MessageReport findByMessage(@Param("message") Message message);
 
-    @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.member.id = :memberId1 OR mr.message_id.member.id = :memberId2")
-    List<MessageReport> findByMemberId(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
+    @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.member.id = :memberId1")
+    List<MessageReport> findByMemberId(@Param("memberId1") Long memberId1);
 }
