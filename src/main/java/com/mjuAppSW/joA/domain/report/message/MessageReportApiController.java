@@ -24,18 +24,18 @@ public class MessageReportApiController {
     }
 
     @PostMapping("/report/message")
-    public HttpStatus messageReport(@RequestBody ReportRequest request){
+    public ResponseEntity<String> messageReport(@RequestBody ReportRequest request){
         log.info("messageReport : messageId = {}, categoryId = {}, content = {}", request.getMessageId(), request.getCategoryId(), request.getContent());
         String save = messageReportService.messageReport(request.getMessageId(), request.getCategoryId(), request.getContent());
         if(save.equals("0")){
             log.info("messageReport Return : OK, success to report");
-            return HttpStatus.OK;
+            return ResponseEntity.ok().build();
         }else if(save.equals("1")){
             log.warn("messageReport Return : BAD_REQUEST, getValue's not correct / messageId = {}, categoryId = {}", request.getMessageId(), request.getCategoryId());
-            return HttpStatus.BAD_REQUEST;
+            return ResponseEntity.badRequest().build();
         }else{
             log.info("messageReport Return : BAD_REQUEST, existed MessageReport / messageId = {}", request.getMessageId());
-            return HttpStatus.BAD_REQUEST;
+            return ResponseEntity.badRequest().build();
         }
     }
 
