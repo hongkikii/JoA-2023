@@ -42,4 +42,8 @@ public class Location {
         this.point = point;
         this.isContained = isContained;
     }
+
+    public void changeIsContained(boolean isContained) {
+        this.isContained = isContained;
+    }
 }

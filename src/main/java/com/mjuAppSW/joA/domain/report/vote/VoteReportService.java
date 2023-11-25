@@ -6,6 +6,8 @@ import static com.mjuAppSW.joA.constant.Constants.ReportVote.REPORT_CATEGORY_IS_
 import static com.mjuAppSW.joA.constant.Constants.ReportVote.VOTE_IS_NOT_EXISTED;
 import static java.util.Objects.isNull;
 
+import com.mjuAppSW.joA.domain.member.Member;
+import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.report.ReportCategory;
 import com.mjuAppSW.joA.domain.report.ReportCategoryRepository;
 import com.mjuAppSW.joA.domain.report.vote.dto.ReportRequest;
@@ -14,6 +16,7 @@ import com.mjuAppSW.joA.domain.vote.VoteRepository;
 import com.mjuAppSW.joA.domain.vote.dto.StatusResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ public class VoteReportService {
     private final VoteRepository voteRepository;
     private final VoteReportRepository voteReportRepository;
     private final ReportCategoryRepository reportCategoryRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public StatusResponse reportVote(ReportRequest request) {
@@ -42,6 +46,11 @@ public class VoteReportService {
 
         VoteReport voteReport = makeVoteReport(vote, reportCategory, request.getContent());
         voteReportRepository.save(voteReport);
+
+        Member giveMember = memberRepository.findById(vote.getGiveId()).orElse(null);
+        if (giveMember != null) {
+            giveMember.addReportCount();
+        }
         return new StatusResponse(NORMAL_OPERATION);
     }
 
