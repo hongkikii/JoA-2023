@@ -1,5 +1,6 @@
 package com.mjuAppSW.joA.geography.location.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 
@@ -10,7 +11,7 @@ public class NearByListResponse {
 
     public NearByListResponse(Integer status) {
         this.status = status;
-        this.nearByList = null;
+        this.nearByList = new ArrayList<>();
     }
     public NearByListResponse(Integer status, List<NearByInfo> nearByList) {
         this.status = status;
