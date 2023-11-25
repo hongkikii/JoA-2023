@@ -24,12 +24,12 @@ public class InitDevMysql {
 
     @PostConstruct
     public void init() {
-        initService.initCollege();
-        initService.initVoteCategory();
-        initService.initReportCategory();
-        initService.initMember();
-        initService.initHeart();
-        initService.initVote();
+//        initService.initCollege();
+//        initService.initVoteCategory();
+//        initService.initReportCategory();
+//        initService.initMember();
+//        initService.initHeart();
+//        initService.initVote();
     }
 
     @Component

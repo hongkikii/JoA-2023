@@ -216,6 +216,10 @@ public class MemberServiceImpl implements MemberService{
             return new StatusResponse(MEMBER_IS_NOT_EXISTED);
 
         findMember.expireSessionId();
+        Location location = locationRepository.findById(findMember.getId()).orElse(null);
+        if(!isNull(location)) {
+            location.changeIsContained(false);
+        }
         return new StatusResponse(NORMAL_OPERATION);
     }
 

@@ -18,7 +18,9 @@ public class BlockApiController {
 
     @PostMapping("/block")
     public ResponseEntity<StatusResponse> execute(@RequestBody BlockRequest blockRequest) {
+        log.info("block : blockerId = {}, blockedId = {}", blockRequest.getBlockerId(), blockRequest.getBlockedId());
         StatusResponse response = blockService.execute(blockRequest);
+        log.info("block return : status = {}", response.getStatus());
         return ResponseEntity.ok(response);
     }
 }
