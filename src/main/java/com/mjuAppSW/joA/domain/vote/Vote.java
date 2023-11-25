@@ -53,4 +53,8 @@ public class Vote {
         this.hint = hint;
         this.isValid = true;
     }
+
+    public void changeInvalid() {
+        this.isValid = false;
+    }
 }
