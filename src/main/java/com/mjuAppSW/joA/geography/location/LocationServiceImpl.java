@@ -66,7 +66,7 @@ public class LocationServiceImpl implements LocationService {
                 (request.getLatitude(), request.getLongitude(), college.getPolygonField());
 
         Point point = getPoint(request.getLatitude(), request.getLongitude(), request.getAltitude());
-        Location newLocation = new Location(location.getId(), location.getCollege(), point, isContained);
+        Location newLocation = new Location(location.getId(), location.getCollege(), point, isContained, LocalDate.now());
         locationRepository.save(newLocation);
         return new UpdateResponse(NORMAL_OPERATION, isContained);
     }
@@ -147,7 +147,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     private List<Long> findNearIds(Long id, Point point, Long collegeId) {
-        return locationRepository.findNearIds(id, point, collegeId);
+        return locationRepository.findNearIds(id, point, collegeId, LocalDate.now());
     }
 
     private List<NearByInfo> makeNearByList(Member member, List<Long> nearMemberIds) {

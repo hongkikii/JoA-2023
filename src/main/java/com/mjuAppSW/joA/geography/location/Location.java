@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,16 +31,20 @@ public class Location {
     @Column(name = "Is_contained")
     private Boolean isContained;
 
+    @Column(name = "Update_date")
+    private LocalDate updateDate;
+
     public Location(Long id, PCollege college) {
         this.id = id;
         this.college = college;
         this.isContained = false;
     }
 
-    public Location(Long id, PCollege college, Point point, Boolean isContained) {
+    public Location(Long id, PCollege college, Point point, Boolean isContained, LocalDate updateDate) {
         this.id = id;
         this.college = college;
         this.point = point;
         this.isContained = isContained;
+        this.updateDate = updateDate;
     }
 }
