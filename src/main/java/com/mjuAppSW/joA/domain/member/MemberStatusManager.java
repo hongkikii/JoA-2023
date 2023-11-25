@@ -53,10 +53,12 @@ public class MemberStatusManager {
         member.changeStopStartDate(today);
         if (reportCount == 5) {
             member.changeStopEndDate(today.plusDays(1));
+            member.changeStatus(1);
             log.info("account stop start : id = {}, reportCount = 5", member.getId());
         }
         if (reportCount == 10) {
             member.changeStopEndDate(today.plusDays(7));
+            member.changeStatus(2);
             log.info("account stop start : id = {}, reportCount = 10", member.getId());
         }
     }
