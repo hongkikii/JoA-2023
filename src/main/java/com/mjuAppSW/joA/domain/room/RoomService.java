@@ -120,7 +120,7 @@ public class RoomService {
             LocalDateTime date = room.getDate();
             Long hours = calculationHour(date);
             if(hours > 168){
-                log.info("roomId = {}", room.getId());
+                log.info("delete : roomId = {}", room.getId());
                 deleteMemory(room);
             }
         }
@@ -131,7 +131,7 @@ public class RoomService {
             LocalDateTime date = room.getDate();
             Long hours = calculationHour(date);
             if(hours > 24){
-                log.info("roomId = {}", room.getId());
+                log.info("delete : roomId = {}", room.getId());
                 deleteMemory(room);
             }
         }

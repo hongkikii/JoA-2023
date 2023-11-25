@@ -17,9 +17,4 @@ public interface MessageReportRepository extends JpaRepository<MessageReport, Lo
 
     @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.member.id = :memberId1 OR mr.message_id.member.id = :memberId2")
     List<MessageReport> findByMemberId(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE MessageReport mr set mr.message_id = null Where mr.message_id = :message_id")
-    void deleteByMessageId(@Param("message_id") Message message_id);
 }

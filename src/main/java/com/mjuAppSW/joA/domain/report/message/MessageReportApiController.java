@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,13 +23,22 @@ public class MessageReportApiController {
     @PostMapping("/report/message")
     public HttpStatus messageReport(@RequestBody ReportRequest request){
         log.info("messageReport : messageId = {}, categoryId = {}, content = {}", request.getMessageId(), request.getCategoryId(), request.getContent());
-        Boolean save = messageReportService.messageReport(request.getMessageId(), request.getCategoryId(), request.getContent());
-        if(save){
+        String save = messageReportService.messageReport(request.getMessageId(), request.getCategoryId(), request.getContent());
+        if(save.equals("0")){
             log.info("messageReport Return : OK, success to report");
             return HttpStatus.OK;
+        }else if(save.equals("1")){
+            log.warn("messageReport Return : BAD_REQUEST, getValue's not correct / messageId = {}, categoryId = {}", request.getMessageId(), request.getCategoryId());
+            return HttpStatus.BAD_REQUEST;
+        }else{
+            log.info("messageReport Return : BAD_REQUEST, existed MessageReport / messageId = {}", request.getMessageId());
+            return HttpStatus.BAD_REQUEST;
         }
-        log.warn("messageReport Return : BAD_REQUEST, getValue's not correct");
-        log.warn("messageReport : messageId = {}, categoryId = {}", request.getMessageId(), request.getCategoryId());
-        return HttpStatus.BAD_REQUEST;
+    }
+
+    @PostMapping("/report/admin/delete")
+    public void deleteMessageReportAdmin(@RequestParam("id") Long id){
+        log.info("deleteMessageReportAdmin : / id = {}", id);
+        messageReportService.deleteMessageReportAdmin(id);
     }
 }
