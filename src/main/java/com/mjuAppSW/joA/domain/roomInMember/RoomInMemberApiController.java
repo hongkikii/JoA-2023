@@ -99,6 +99,7 @@ public class RoomInMemberApiController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("/load/userInfo")
     public ResponseEntity<UserInfoDTO> getUserInfo(@RequestParam("roomId") Long roomId,
                                                    @RequestParam("memberId") Long memberId){
