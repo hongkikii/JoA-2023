@@ -43,16 +43,16 @@ public class MemberProfileServiceImpl implements MemberProfileService {
     public SetResponse set(Long id) {
         Member member = findBySessionId(id);
         if (isNull(member))
-            return null;
+            return new SetResponse(1);
 
         if (memberAccessor.isStopped(member.getSessionId()))
-            return null;
+            return new SetResponse(2);
 
         String urlCode = EMPTY_STRING;
         if (!member.getBasicProfile())
             urlCode = member.getUrlCode();
 
-        return new SetResponse(member.getName(), urlCode);
+        return new SetResponse(0, member.getName(), urlCode);
     }
 
     public MyPageResponse sendMyPage(Long id) {
