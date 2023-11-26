@@ -211,11 +211,13 @@ public class MemberServiceImpl implements MemberService{
         if(isNull(findMember))
             return new StatusResponse(MEMBER_IS_NOT_EXISTED);
 
-        findMember.expireSessionId();
         Location location = locationRepository.findById(findMember.getId()).orElse(null);
         if(!isNull(location)) {
-            location.changeIsContained(false);
+            Location newLocation = new Location(location.getId(), location.getCollege(),
+                    location.getPoint(), false, location.getUpdateDate());
+            locationRepository.save(newLocation);
         }
+        findMember.expireSessionId();
         return new StatusResponse(NORMAL_OPERATION);
     }
 

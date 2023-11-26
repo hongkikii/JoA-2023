@@ -49,8 +49,8 @@ public class VoteServiceImpl implements VoteService {
         if (!isNull(equalVote))
             return new StatusResponse(VOTE_IS_EXISTED);
 
-        List<Vote> notValidVotes = voteRepository.findNotValidVote(giveMember.getId(),takeMember.getId());
-        if (notValidVotes.size() != 0)
+        List<Vote> invalidVotes = voteRepository.findInvalidVotes(giveMember.getId(),takeMember.getId());
+        if (invalidVotes.size() != 0)
             return new StatusResponse(GIVE_MEMBER_CANNOT_SEND_TO_OPPONENT);
 
         Vote vote = makeVote(giveMember, takeMember, voteCategory, request.getHint());

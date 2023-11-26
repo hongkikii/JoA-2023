@@ -19,5 +19,5 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     List<Vote> findValidAllByTakeId(@Param("takeId") Long takeId, Pageable pageable);
 
     @Query("SELECT v FROM Vote v WHERE v.giveId = :giveId AND v.member.id = :takeId AND v.isValid = false")
-    List<Vote> findNotValidVote(@Param("giveId") Long giveId, @Param("takeId") Long takeId);
+    List<Vote> findInvalidVotes(@Param("giveId") Long giveId, @Param("takeId") Long takeId);
 }
