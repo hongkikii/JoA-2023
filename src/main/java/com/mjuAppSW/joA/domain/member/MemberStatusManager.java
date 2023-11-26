@@ -28,6 +28,9 @@ public class MemberStatusManager {
     public void check() {
         List<Member> joiningAll = memberRepository.findJoiningAll();
         for (Member member : joiningAll) {
+            if(member.getStatus() == 1 || member.getStatus() == 2) {
+                completeStopPolicy(member);
+            }
             if (member.getReportCount() >= 5 && member.getStatus() != 1 && member.getStatus() != 2
                     && member.getStatus() != 11 && member.getStatus() != 22) {
                 executeStopPolicy(member, 5);
@@ -43,14 +46,6 @@ public class MemberStatusManager {
     }
 
     private void executeStopPolicy(Member member, int reportCount) {
-        if (!isNull(member.getStopEndDate()) && member.getStopEndDate() == LocalDate.now()) {
-           completeStopPolicy(member, reportCount);
-           return;
-        }
-        saveStop(member, reportCount);
-    }
-
-    private void saveStop(Member member, int reportCount) {
         LocalDate today = LocalDate.now();
         member.changeStopStartDate(today);
         if (reportCount == 5) {
@@ -65,12 +60,16 @@ public class MemberStatusManager {
         }
     }
 
-    private void completeStopPolicy(Member member, int reportCount) {
-        if (reportCount == 5) {
+    private void completeStopPolicy(Member member) {
+        if(member.getStopEndDate() != LocalDate.now()) {
+            log.info("account stop ing : id = {}", member.getId());
+            return;
+        }
+        if (member.getStatus() == 1) {
             member.changeStatus(11);
             log.info("account stop end : id = {}, reportCount = 5", member.getId());
         }
-        if (reportCount == 10) {
+        if (member.getStatus() == 2) {
             member.changeStatus(22);
             log.info("account stop end : id = {}, reportCount = 10", member.getId());
         }

@@ -32,6 +32,11 @@ public class BlockService {
             return new StatusResponse(1);
         }
 
+        Block equalBlock = blockRepository.findEqualBlock(blockerLocation.getId(), blockedLocation.getId());
+        if (!isNull(equalBlock)) {
+            return new StatusResponse(2);
+        }
+
         Block saveBlock = new Block(blockerLocation, blockedLocation);
         blockRepository.save(saveBlock);
         return new StatusResponse(0);
