@@ -10,6 +10,7 @@ public class Constants {
         public static Integer MEMBER_IS_INVALID = 2;
         public static Integer HEART_IS_EXISTED = 1;
         public static Integer ROOM_IS_EXISTED = 3;
+        public static Integer BLOCK_IS_EXISTED = 4;
     }
 
     public static class Vote {
@@ -17,6 +18,7 @@ public class Constants {
         public static Integer VOTE_CATEGORY_IS_NOT_VALID = 2;
         public static Integer VOTE_IS_EXISTED = 1;
         public static Integer GIVE_MEMBER_CANNOT_SEND_TO_OPPONENT = 4;
+        public static Integer BLOCK_IS_EXISTED = 5;
     }
 
     public static class GeographyUpdate {
