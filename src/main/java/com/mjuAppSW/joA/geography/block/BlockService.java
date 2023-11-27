@@ -9,6 +9,7 @@ import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.geography.location.Location;
 import com.mjuAppSW.joA.geography.location.LocationRepository;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +33,8 @@ public class BlockService {
             return new StatusResponse(1);
         }
 
-        Block equalBlock = blockRepository.findEqualBlock(blockerLocation.getId(), blockedLocation.getId());
-        if (!isNull(equalBlock)) {
+        Optional<Block> equalBlock = blockRepository.findEqualBlock(blockerLocation.getId(), blockedLocation.getId());
+        if (equalBlock.isPresent()) {
             return new StatusResponse(2);
         }
 

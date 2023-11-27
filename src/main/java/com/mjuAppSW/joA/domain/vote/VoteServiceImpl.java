@@ -1,6 +1,7 @@
 package com.mjuAppSW.joA.domain.vote;
 
 import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
+import static com.mjuAppSW.joA.constant.Constants.Vote.BLOCK_IS_EXISTED;
 import static com.mjuAppSW.joA.constant.Constants.Vote.GIVE_MEMBER_CANNOT_SEND_TO_OPPONENT;
 import static com.mjuAppSW.joA.constant.Constants.Vote.MEMBER_IS_INVALID;
 import static com.mjuAppSW.joA.constant.Constants.Vote.VOTE_CATEGORY_IS_NOT_VALID;
@@ -16,6 +17,8 @@ import com.mjuAppSW.joA.domain.vote.dto.VoteContent;
 import com.mjuAppSW.joA.domain.vote.dto.VoteListResponse;
 import com.mjuAppSW.joA.domain.voteCategory.VoteCategory;
 import com.mjuAppSW.joA.domain.voteCategory.VoteCategoryRepository;
+import com.mjuAppSW.joA.geography.block.Block;
+import com.mjuAppSW.joA.geography.block.BlockRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Service;
 public class VoteServiceImpl implements VoteService {
     private final VoteRepository voteRepository;
     private final VoteCategoryRepository voteCategoryRepository;
+    private final BlockRepository blockRepository;
     private final MemberAccessor memberAccessor;
 
     @Transactional
@@ -45,13 +49,21 @@ public class VoteServiceImpl implements VoteService {
         if(isNull(voteCategory))
             return new StatusResponse(VOTE_CATEGORY_IS_NOT_VALID);
 
-        Vote equalVote = findEqualVote(giveMember.getId(), takeMember.getId(), voteCategory.getId());
+        Long giveMemberId = giveMember.getId();
+        Long takeMemberId = takeMember.getId();
+
+        Vote equalVote = findEqualVote(giveMemberId, takeMemberId, voteCategory.getId());
         if (!isNull(equalVote))
             return new StatusResponse(VOTE_IS_EXISTED);
 
-        List<Vote> invalidVotes = voteRepository.findInvalidVotes(giveMember.getId(),takeMember.getId());
+        List<Vote> invalidVotes = voteRepository.findInvalidVotes(giveMemberId,takeMemberId);
         if (invalidVotes.size() != 0)
             return new StatusResponse(GIVE_MEMBER_CANNOT_SEND_TO_OPPONENT);
+
+        List<Block> blocks = blockRepository.findBlockByIds(takeMemberId, giveMemberId);
+        if (blocks.size() != 0) {
+            return new StatusResponse(BLOCK_IS_EXISTED);
+        }
 
         Vote vote = makeVote(giveMember, takeMember, voteCategory, request.getHint());
         voteRepository.save(vote);
