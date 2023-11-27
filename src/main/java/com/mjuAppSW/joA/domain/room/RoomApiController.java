@@ -4,6 +4,7 @@ import com.mjuAppSW.joA.domain.room.dto.RoomCheckRequest;
 import com.mjuAppSW.joA.domain.room.dto.RoomResponse;
 import com.mjuAppSW.joA.domain.room.dto.RoomUpdateRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +31,19 @@ public class RoomApiController {
         return ResponseEntity.ok(roomResponse);
     }
 
-    @PostMapping("/check/createdTime") // 방의 생성시간이 24시간이 넘었는지
-    public HttpStatus checkCreateAtRoom(@RequestBody RoomCheckRequest roomCheckRequest){
+    @PostMapping("/check/createdTime")
+    public ResponseEntity<String> checkCreateAtRoom(@RequestBody RoomCheckRequest roomCheckRequest){
         log.info("checkCreateAtRoom : roomId = {} ", roomCheckRequest.getRoomId());
         int checkCreatedAt = roomService.checkCreateAtRoom(roomCheckRequest.getRoomId());
         if(checkCreatedAt == 0){
-            log.info("checkCreateAtRoom Return : OK, over 24hours");
-            return HttpStatus.OK;
+            log.info("checkCreateAtRoom Return : BAD_REQUEST, over 24hours");
+            return ResponseEntity.badRequest().build();
         }else if(checkCreatedAt == 1){
-            log.info("checkCreateAtRoom Return : NOT_FOUND, not over 24hours");
-            return HttpStatus.NOT_FOUND;
+            log.info("checkCreateAtRoom Return : OK, not over 24hours");
+            return ResponseEntity.ok().build();
         }else{
             log.warn("checkCreateAtRoom Return : BAD_REQUEST, roomId's not correct / roomId = {}", roomCheckRequest.getRoomId());
-            return HttpStatus.BAD_REQUEST;
+            return ResponseEntity.notFound().build();
         }
     }
 
