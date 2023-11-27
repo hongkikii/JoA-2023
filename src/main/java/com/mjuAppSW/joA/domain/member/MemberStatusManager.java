@@ -22,8 +22,8 @@ public class MemberStatusManager {
     private final MemberRepository memberRepository;
     private final LocationRepository locationRepository;
 
-//    @Scheduled(cron = "0 0 4 * * ?")
-    @Scheduled(cron = "0 */10 * * * *") // 10분마다
+    @Scheduled(cron = "0 0 4 * * ?")
+//    @Scheduled(cron = "0 */10 * * * *")
     @Transactional
     public void check() {
         List<Member> joiningAll = memberRepository.findJoiningAll();
