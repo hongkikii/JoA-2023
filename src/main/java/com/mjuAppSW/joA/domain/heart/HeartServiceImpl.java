@@ -1,6 +1,7 @@
 package com.mjuAppSW.joA.domain.heart;
 
 import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
+import static com.mjuAppSW.joA.constant.Constants.Heart.BLOCK_IS_EXISTED;
 import static com.mjuAppSW.joA.constant.Constants.Heart.HEART_IS_EXISTED;
 import static com.mjuAppSW.joA.constant.Constants.Heart.MEMBER_IS_INVALID;
 import static com.mjuAppSW.joA.constant.Constants.Heart.ROOM_IS_EXISTED;
@@ -16,6 +17,8 @@ import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberAccessor;
 import com.mjuAppSW.joA.domain.roomInMember.RoomInMember;
 import com.mjuAppSW.joA.domain.roomInMember.RoomInMemberRepository;
+import com.mjuAppSW.joA.geography.block.Block;
+import com.mjuAppSW.joA.geography.block.BlockRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +33,7 @@ public class HeartServiceImpl implements HeartService {
 
     private final HeartRepository heartRepository;
     private final RoomInMemberRepository roomInMemberRepository;
+    private final BlockRepository blockRepository;
     private final MemberAccessor memberAccessor;
 
     @Transactional
@@ -47,6 +51,11 @@ public class HeartServiceImpl implements HeartService {
         Heart equalHeart = findEqualByIdAndDate(giveMemberId, takeMemberId);
         if (!isNull(equalHeart))
             return new HeartResponse(HEART_IS_EXISTED);
+
+        List<Block> blocks = blockRepository.findBlockByIds(takeMemberId, giveMemberId);
+        if (blocks.size() != 0) {
+            return new HeartResponse(BLOCK_IS_EXISTED);
+        }
 
         Heart heart = makeHeart(giveMemberId, takeMember, isNamed);
         heartRepository.save(heart);
