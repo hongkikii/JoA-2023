@@ -132,12 +132,15 @@ public class RoomInMemberService {
                 }
             });
 
-            for(RoomInfoVO roomInfoVO : combinedList){
+            for(RoomInfoVO roomInfoVO : combinedList) {
                 RoomListDTO roomDTO = new RoomListDTO(roomInfoVO.getRoomId(), roomInfoVO.getName(), roomInfoVO.getUrlCode(),
                         roomInfoVO.getContent(), roomInfoVO.getUnCheckedMessage());
                 roomListDTOList.add(roomDTO);
             }
-
+            for(RoomListDTO roomListDTO : roomListDTOList){
+                log.info("GetRoomList Return : roomId = {}, name = {}, urlCode = {}, content = {}, getUncheckedMessage = {}",
+                        roomListDTO.getRoomId(), roomListDTO.getName(), roomListDTO.getUrlCode(), roomListDTO.getContent(), roomListDTO.getUnCheckedMessage());
+            }
             return new RoomListVO(roomListDTOList, "0");
         }
         return new RoomListVO(null, "2");
