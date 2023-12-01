@@ -54,6 +54,9 @@ public class MessageReportService {
                     .date(LocalDateTime.now())
                     .build();
             MessageReport saveMessageReport = messageReportRepository.save(messageReport);
+
+            Member reportedMember = memberRepository.findById(message.getMember().getId()).orElse(null);
+            if(reportedMember != null){reportedMember.addReportCount();}
             if(saveMessageReport != null) return "0";
         }
         return "1";

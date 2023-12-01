@@ -137,10 +137,6 @@ public class RoomInMemberService {
                         roomInfoVO.getContent(), roomInfoVO.getUnCheckedMessage());
                 roomListDTOList.add(roomDTO);
             }
-            for(RoomListDTO roomListDTO : roomListDTOList){
-                log.info("GetRoomList Return : roomId = {}, name = {}, urlCode = {}, content = {}, getUncheckedMessage = {}",
-                        roomListDTO.getRoomId(), roomListDTO.getName(), roomListDTO.getUrlCode(), roomListDTO.getContent(), roomListDTO.getUnCheckedMessage());
-            }
             return new RoomListVO(roomListDTOList, "0");
         }
         return new RoomListVO(null, "2");
