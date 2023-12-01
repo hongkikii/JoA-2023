@@ -39,17 +39,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private RoomRepository roomRepository;
     private MemberRepository memberRepository;
     private RoomService roomService;
+    private MessageReportRepository messageReportRepository;
 
     @Autowired
     public WebSocketHandler(RoomInMemberService roomInMemberService, MessageService messageService,
                             RoomRepository roomRepository, MemberRepository memberRepository, RoomService roomService,
-                            RoomInMemberRepository roomInMemberRepository){
+                            RoomInMemberRepository roomInMemberRepository, MessageReportRepository messageReportRepository){
         this.roomInMemberService = roomInMemberService;
         this.messageService = messageService;
         this.roomRepository = roomRepository;
         this.memberRepository = memberRepository;
         this.roomService = roomService;
         this.roomInMemberRepository = roomInMemberRepository;
+        this.messageReportRepository = messageReportRepository;
     }
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -90,6 +92,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void sendMessage(String roomId, String memberId1, String content,
                             WebSocketSession session) throws Exception {
         String memberId = sessionIdToMemberId(memberId1);
+        // check MessageReport
+        List<MessageReport> checkMessageReport = messageReportRepository.findByRoomId(Long.parseLong(roomId));
         // check Expired
         Boolean checkExpired = roomInMemberService.checkExpired(Long.parseLong(roomId), Long.parseLong(memberId));
         // check createdAt
@@ -97,7 +101,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         // check isWithDrawal
         Boolean checkIsWithDrawal = roomInMemberService.checkIsWithDrawal(Long.parseLong(roomId), Long.parseLong(memberId));
 
-        if(checkExpired && checkTime == 0 && checkIsWithDrawal){
+        if(checkExpired && checkTime == 0 && checkIsWithDrawal && checkMessageReport.isEmpty()){
             List<WebSocketSession> roomSessionsList = roomSessions.get(roomId);
             if(roomSessionsList != null){
                 int count = 2;
@@ -142,6 +146,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }else if(!checkIsWithDrawal){
             log.info("checkIsWithDrawal : roomId = {}", roomId);
             String outMessage = "상대방이 탈퇴하였습니다.";
+            sendExceptionMessage(roomId, session, outMessage);
+        }else if(!checkMessageReport.isEmpty()){
+            log.info("checkMessageReport : roomId = {}", roomId);
+            String outMessage = "신고된 방입니다.";
             sendExceptionMessage(roomId, session, outMessage);
         }
     }
