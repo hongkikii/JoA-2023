@@ -1,10 +1,9 @@
 package com.mjuAppSW.joA.domain.member;
 
-import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
-import static java.util.Objects.isNull;
+import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
 
 import com.mjuAppSW.joA.geography.location.LocationRepository;
-import com.mjuAppSW.joA.storage.S3Uploader;
+import com.mjuAppSW.joA.common.storage.S3Uploader;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;

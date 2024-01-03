@@ -1,19 +1,19 @@
 package com.mjuAppSW.joA.domain.report.vote;
 
-import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
-import static com.mjuAppSW.joA.constant.Constants.ReportVote.EQUAL_VOTE_REPORT_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.ReportVote.REPORT_CATEGORY_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.ReportVote.VOTE_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
+import static com.mjuAppSW.joA.common.constant.Constants.ReportVote.EQUAL_VOTE_REPORT_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.ReportVote.REPORT_CATEGORY_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.ReportVote.VOTE_IS_NOT_EXISTED;
 import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.report.ReportCategory;
 import com.mjuAppSW.joA.domain.report.ReportCategoryRepository;
-import com.mjuAppSW.joA.domain.report.vote.dto.ReportRequest;
+import com.mjuAppSW.joA.domain.report.vote.dto.VoteReportRequest;
 import com.mjuAppSW.joA.domain.vote.Vote;
 import com.mjuAppSW.joA.domain.vote.VoteRepository;
-import com.mjuAppSW.joA.domain.vote.dto.StatusResponse;
+import com.mjuAppSW.joA.domain.vote.dto.response.StatusResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class VoteReportService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public StatusResponse reportVote(ReportRequest request) {
+    public StatusResponse reportVote(VoteReportRequest request) {
         Long voteId = request.getVoteId();
         Vote vote = findVoteById(voteId);
         ReportCategory reportCategory = findReportCategoryById(request.getReportId());

@@ -1,14 +1,14 @@
 package com.mjuAppSW.joA.domain.heart;
 
-import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.constant.Constants.Heart.BLOCK_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Heart.HEART_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Heart.MEMBER_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.Heart.ROOM_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Heart.USER_IS_ANONYMOUS;
-import static com.mjuAppSW.joA.constant.Constants.Heart.USER_IS_MATCHED;
-import static com.mjuAppSW.joA.constant.Constants.Heart.USER_IS_NAMED;
-import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
+import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.BLOCK_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.HEART_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.MEMBER_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.ROOM_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.USER_IS_ANONYMOUS;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.USER_IS_MATCHED;
+import static com.mjuAppSW.joA.common.constant.Constants.Heart.USER_IS_NAMED;
+import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
 import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.domain.heart.dto.HeartRequest;

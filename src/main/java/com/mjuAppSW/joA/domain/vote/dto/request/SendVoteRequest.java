@@ -1,13 +1,14 @@
-package com.mjuAppSW.joA.domain.heart.dto;
+package com.mjuAppSW.joA.domain.vote.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-@Schema(description = "하트 전송 Request")
-public class HeartRequest {
+@Schema(description = "투표 전송 Response")
+public class SendVoteRequest {
     @JsonProperty("giveId")
     @NotNull
     private Long giveId;
@@ -16,7 +17,11 @@ public class HeartRequest {
     @NotNull
     private Long takeId;
 
-    @JsonProperty("named")
+    @JsonProperty("categoryId")
     @NotNull
-    private Boolean named;
+    private Long categoryId;
+
+    @JsonProperty("hint")
+    @Size(max = 15)
+    private String hint;
 }

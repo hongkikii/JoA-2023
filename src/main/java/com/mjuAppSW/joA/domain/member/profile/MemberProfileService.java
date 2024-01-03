@@ -1,20 +1,17 @@
 package com.mjuAppSW.joA.domain.member.profile;
 
-import com.mjuAppSW.joA.domain.member.dto.BioRequest;
-import com.mjuAppSW.joA.domain.member.dto.MyPageResponse;
-import com.mjuAppSW.joA.domain.member.dto.NameRequest;
-import com.mjuAppSW.joA.domain.member.dto.PictureRequest;
-import com.mjuAppSW.joA.domain.member.dto.SessionIdRequest;
-import com.mjuAppSW.joA.domain.member.dto.SetResponse;
-import com.mjuAppSW.joA.domain.member.dto.StatusResponse;
+import com.mjuAppSW.joA.domain.member.dto.request.BioRequest;
+import com.mjuAppSW.joA.domain.member.dto.response.MyPageResponse;
+import com.mjuAppSW.joA.domain.member.dto.request.PictureRequest;
+import com.mjuAppSW.joA.domain.member.dto.request.SessionIdRequest;
+import com.mjuAppSW.joA.domain.member.dto.response.SetPageResponse;
+import com.mjuAppSW.joA.domain.member.dto.response.StatusResponse;
 
 public interface MemberProfileService {
 
-    SetResponse set(Long id);
+    SetPageResponse getSettingPage(Long id);
 
-    MyPageResponse sendMyPage(Long id);
-
-    StatusResponse transName(NameRequest request);
+    MyPageResponse getMyPage(Long id);
 
     StatusResponse transBio(BioRequest request);
 

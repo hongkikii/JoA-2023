@@ -1,12 +1,12 @@
 package com.mjuAppSW.joA.geography.location;
 
-import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.constant.Constants.GeographyInfo;
-import static com.mjuAppSW.joA.constant.Constants.GeographyList;
-import static com.mjuAppSW.joA.constant.Constants.GeographyUpdate.COLLEGE_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.GeographyUpdate.MEMBER_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.GeographyUpdate.MEMBER_IS_STOPPED;
-import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
+import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
+import static com.mjuAppSW.joA.common.constant.Constants.GeographyInfo;
+import static com.mjuAppSW.joA.common.constant.Constants.GeographyList;
+import static com.mjuAppSW.joA.common.constant.Constants.GeographyUpdate.COLLEGE_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.GeographyUpdate.MEMBER_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.GeographyUpdate.MEMBER_IS_STOPPED;
+import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
 import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.domain.heart.Heart;
@@ -19,12 +19,12 @@ import com.mjuAppSW.joA.geography.block.dto.BlockRequest;
 import com.mjuAppSW.joA.geography.block.dto.StatusResponse;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
-import com.mjuAppSW.joA.geography.location.dto.NearByInfo;
-import com.mjuAppSW.joA.geography.location.dto.NearByListResponse;
-import com.mjuAppSW.joA.geography.location.dto.OwnerResponse;
-import com.mjuAppSW.joA.geography.location.dto.PolygonRequest;
-import com.mjuAppSW.joA.geography.location.dto.UpdateRequest;
-import com.mjuAppSW.joA.geography.location.dto.UpdateResponse;
+import com.mjuAppSW.joA.geography.location.dto.response.NearByInfo;
+import com.mjuAppSW.joA.geography.location.dto.response.NearByListResponse;
+import com.mjuAppSW.joA.geography.location.dto.response.OwnerResponse;
+import com.mjuAppSW.joA.geography.location.dto.request.PolygonRequest;
+import com.mjuAppSW.joA.geography.location.dto.request.UpdateRequest;
+import com.mjuAppSW.joA.geography.location.dto.response.UpdateResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -98,8 +98,8 @@ public class LocationServiceImpl implements LocationService {
         return new NearByListResponse(NORMAL_OPERATION, nearByList);
     }
 
-    public OwnerResponse getOwnerInfo(Long id) {
-        Member findMember = memberAccessor.findBySessionId(id);
+    public OwnerResponse getOwner(Long sessionId) {
+        Member findMember = memberAccessor.findBySessionId(sessionId);
         if(isNull(findMember))
             return OwnerResponse.builder()
                                 .status(GeographyInfo.MEMBER_IS_INVALID)
@@ -114,7 +114,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Transactional
-    public StatusResponse execute(BlockRequest request) {
+    public StatusResponse block(BlockRequest request) {
         Member blockerMember = memberAccessor.findBySessionId(request.getBlockerId());
         if (isNull(blockerMember)) {
             return new StatusResponse(1);
@@ -143,11 +143,6 @@ public class LocationServiceImpl implements LocationService {
         PCollege college = new PCollege(request.getCollegeId(), polygon);
         pCollegeRepository.save(college);
     }
-
-//    @Transactional
-//    public void deleteLocation(IdRequest request) {
-//        locationRepository.deleteById(request.getId());
-//    }
 
     private Location findLocationById(Long id) {
         return locationRepository.findById(id).orElse(null);

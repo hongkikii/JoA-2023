@@ -2,20 +2,20 @@ package com.mjuAppSW.joA.geography.location;
 
 import com.mjuAppSW.joA.geography.block.dto.BlockRequest;
 import com.mjuAppSW.joA.geography.block.dto.StatusResponse;
-import com.mjuAppSW.joA.geography.location.dto.NearByListResponse;
-import com.mjuAppSW.joA.geography.location.dto.OwnerResponse;
-import com.mjuAppSW.joA.geography.location.dto.PolygonRequest;
-import com.mjuAppSW.joA.geography.location.dto.UpdateRequest;
-import com.mjuAppSW.joA.geography.location.dto.UpdateResponse;
+import com.mjuAppSW.joA.geography.location.dto.response.NearByListResponse;
+import com.mjuAppSW.joA.geography.location.dto.response.OwnerResponse;
+import com.mjuAppSW.joA.geography.location.dto.request.PolygonRequest;
+import com.mjuAppSW.joA.geography.location.dto.request.UpdateRequest;
+import com.mjuAppSW.joA.geography.location.dto.response.UpdateResponse;
 
 public interface LocationService {
     UpdateResponse updateLocation(UpdateRequest request);
 
     NearByListResponse getNearByList(UpdateRequest request);
 
-    OwnerResponse getOwnerInfo(Long id);
+    OwnerResponse getOwner(Long id);
 
-    StatusResponse execute(BlockRequest request);
+    StatusResponse block(BlockRequest request);
 
     void setPolygon(PolygonRequest request);
 }
