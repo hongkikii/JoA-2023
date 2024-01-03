@@ -13,6 +13,10 @@ import com.mjuAppSW.joA.domain.heart.Heart;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberAccessor;
+import com.mjuAppSW.joA.geography.block.Block;
+import com.mjuAppSW.joA.geography.block.BlockRepository;
+import com.mjuAppSW.joA.geography.block.dto.BlockRequest;
+import com.mjuAppSW.joA.geography.block.dto.StatusResponse;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
 import com.mjuAppSW.joA.geography.location.dto.NearByInfo;
@@ -25,6 +29,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -42,6 +47,7 @@ public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
     private final PCollegeRepository pCollegeRepository;
+    private final BlockRepository blockRepository;
     private final MemberAccessor memberAccessor;
     private final HeartRepository heartRepository;
 
@@ -105,6 +111,29 @@ public class LocationServiceImpl implements LocationService {
                             .urlCode(findMember.getUrlCode())
                             .bio(findMember.getBio())
                             .build();
+    }
+
+    @Transactional
+    public StatusResponse execute(BlockRequest request) {
+        Member blockerMember = memberAccessor.findBySessionId(request.getBlockerId());
+        if (isNull(blockerMember)) {
+            return new StatusResponse(1);
+        }
+        Location blockerLocation = locationRepository.findById(blockerMember.getId()).orElse(null);
+        Location blockedLocation = locationRepository.findById(request.getBlockedId()).orElse(null);
+
+        if (isNull(blockerLocation) || isNull(blockedLocation)) {
+            return new StatusResponse(1);
+        }
+
+        Optional<Block> equalBlock = blockRepository.findEqualBlock(blockerLocation.getId(), blockedLocation.getId());
+        if (equalBlock.isPresent()) {
+            return new StatusResponse(2);
+        }
+
+        Block saveBlock = new Block(blockerLocation, blockedLocation);
+        blockRepository.save(saveBlock);
+        return new StatusResponse(0);
     }
 
     @Transactional

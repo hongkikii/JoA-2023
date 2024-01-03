@@ -1,5 +1,7 @@
 package com.mjuAppSW.joA.geography.location;
 
+import com.mjuAppSW.joA.geography.block.dto.BlockRequest;
+import com.mjuAppSW.joA.geography.block.dto.StatusResponse;
 import com.mjuAppSW.joA.geography.location.dto.NearByListResponse;
 import com.mjuAppSW.joA.geography.location.dto.OwnerResponse;
 import com.mjuAppSW.joA.geography.location.dto.PolygonRequest;
@@ -75,6 +77,14 @@ public class LocationApiController {
         else {
             log.warn("getLocationOwnerInfo Return :  OK, status = {}", response.getStatus());
         }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/block")
+    public ResponseEntity<StatusResponse> execute(@RequestBody BlockRequest blockRequest) {
+        log.info("block : blockerId = {}, blockedId = {}", blockRequest.getBlockerId(), blockRequest.getBlockedId());
+        StatusResponse response = locationService.execute(blockRequest);
+        log.info("block return : status = {}", response.getStatus());
         return ResponseEntity.ok(response);
     }
 }
