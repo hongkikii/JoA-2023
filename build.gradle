@@ -37,7 +37,7 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'javax.mail:javax.mail-api:1.6.2'
-	implementation platform("io.awspring.cloud:spring-cloud-aws-starters:3.0.0-M1")
+	implementation platform('io.awspring.cloud:spring-cloud-aws-starters:3.0.0-M2')
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.0-M1")
 	implementation platform('software.amazon.awssdk:bom:2.20.56')
 	implementation 'software.amazon.awssdk:s3'
@@ -47,6 +47,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.mindrot:jbcrypt:0.4'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	runtimeOnly 'mysql:mysql-connector-java'
