@@ -75,7 +75,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationServiceImpl implements MemberService{
+public class AuthenticationServiceImpl implements AuthenticationService {
+
     private final MemberRepository memberRepository;
     private final MCollegeRepository mCollegeRepository;
     private final PCollegeRepository pCollegeRepository;
@@ -87,15 +88,18 @@ public class AuthenticationServiceImpl implements MemberService{
 
     public UMailResponse sendCertifyNum(UMailRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
-        if (isNull(college))
+        if (isNull(college)) {
             return new UMailResponse(COLLEGE_IS_INVALID);
+        }
 
-        if(isExistedMember(request.getUEmail(), college))
+        if (isExistedMember(request.getUEmail(), college)) {
             return new UMailResponse(MEMBER_IS_EXISTED);
+        }
 
         String eMail = request.getUEmail() + college.getDomain();
-        if(isUsingMail(eMail))
+        if (isUsingMail(eMail)) {
             return new UMailResponse(MAIL_IS_USING);
+        }
 
         long sessionId = sessionManager.makeSessionId();
         String certifyNum = cacheCertifyNumAndEmail(sessionId, eMail);
@@ -105,16 +109,19 @@ public class AuthenticationServiceImpl implements MemberService{
 
     public StatusResponse authCertifyNum(UNumRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
-        if (isNull(college))
+        if (isNull(college)) {
             return new StatusResponse(Auth.COLLEGE_IS_NOT_EXISTED);
+        }
 
         Long sessionId = request.getId();
-        if (isNotExistedCacheKey(CERTIFY_NUMBER+sessionId))
+        if (isNotExistedCacheKey(CERTIFY_NUMBER + sessionId)) {
             return new StatusResponse(SESSION_ID_IS_NOT_EXISTED);
+        }
 
         String mail = request.getUEmail() + college.getDomain();
-        if(!isEqualCacheValue(BEFORE_EMAIL + sessionId, mail))
+        if (!isEqualCacheValue(BEFORE_EMAIL + sessionId, mail)) {
             return new StatusResponse(MAIL_IS_NOT_CACHED);
+        }
 
         if (isEqualCacheValue(CERTIFY_NUMBER + sessionId, request.getCertifyNum())) {
             cacheEmailOnly(sessionId);
@@ -125,18 +132,22 @@ public class AuthenticationServiceImpl implements MemberService{
     }
 
     public StatusResponse verifyId(Long sessionId, String loginId) {
-        if (isNotValidLoginId(loginId))
+        if (isNotValidLoginId(loginId)) {
             return new StatusResponse(LOGIN_ID_IS_INVALID);
+        }
 
-        if (isNotExistedCacheKey(AFTER_EMAIL + sessionId))
+        if (isNotExistedCacheKey(AFTER_EMAIL + sessionId)) {
             return new StatusResponse(SESSION_ID_IS_NOT_EXISTED);
+        }
 
-        if (!isNull(findByLoginId(loginId)))
+        if (!isNull(findByLoginId(loginId))) {
             return new StatusResponse(LOGIN_ID_IS_EXISTED);
+        }
 
-        if(isCachedLoginId(loginId)) {
-            if (isMyJoiningId(sessionId, loginId))
+        if (isCachedLoginId(loginId)) {
+            if (isMyJoiningId(sessionId, loginId)) {
                 return new StatusResponse(NORMAL_OPERATION);
+            }
             return new StatusResponse(LOGIN_ID_IS_CACHED);
         }
 
@@ -146,16 +157,19 @@ public class AuthenticationServiceImpl implements MemberService{
 
     @Transactional
     public StatusResponse join(JoinRequest request) {
-        if (isNotValidPassword(request.getPassword()))
+        if (isNotValidPassword(request.getPassword())) {
             return new StatusResponse(Join.PASSWORD_IS_INVALID);
+        }
 
         Long sessionId = request.getId();
-        if(isNotExistedCacheKey(AFTER_EMAIL+sessionId))
+        if (isNotExistedCacheKey(AFTER_EMAIL + sessionId)) {
             return new StatusResponse(Join.SESSION_ID_IS_NOT_EXISTED);
+        }
 
         String loginId = request.getLoginId();
-        if(isNotCachedLoginId(sessionId, request.getLoginId()))
+        if (isNotCachedLoginId(sessionId, request.getLoginId())) {
             return new StatusResponse(Join.LOGIN_ID_IS_NOT_CACHED);
+        }
 
         String eMail = cacheManager.getData(AFTER_EMAIL + sessionId);
         String[] splitEMail = eMail.split(EMAIL_SPLIT);
@@ -163,25 +177,27 @@ public class AuthenticationServiceImpl implements MemberService{
         MCollege mCollege = findByDomain(splitEMail[1]);
 
         PCollege pCollege = findByPCollegeId(mCollege.getId());
-        if(isNull(pCollege))
+        if (isNull(pCollege)) {
             return new StatusResponse(Join.COLLEGE_IS_INVALID);
+        }
 
-        if (isForbiddenMail(uEmail, mCollege))
+        if (isForbiddenMail(uEmail, mCollege)) {
             return new StatusResponse(Join.MAIL_IS_FORBIDDEN);
+        }
 
         // 비밀번호 암호화
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
 
         Member joinMember = Member.builder()
-                                    .name(request.getName())
-                                    .loginId(loginId)
-                                    .password(hashedPassword)
-                                    .salt(salt)
-                                    .uEmail(splitEMail[0])
-                                    .college(mCollege)
-                                    .sessionId(sessionId)
-                                    .build();
+                .name(request.getName())
+                .loginId(loginId)
+                .password(hashedPassword)
+                .salt(salt)
+                .uEmail(splitEMail[0])
+                .college(mCollege)
+                .sessionId(sessionId)
+                .build();
         memberRepository.save(joinMember);
 
         Location joinLocation = new Location(joinMember.getId(), pCollege);
@@ -193,16 +209,18 @@ public class AuthenticationServiceImpl implements MemberService{
     @Transactional
     public LoginResponse login(LoginRequest request) {
         Member findMember = findByLoginId(request.getLoginId());
-        if (isNull(findMember))
+        if (isNull(findMember)) {
             return new LoginResponse(LOGIN_ID_IS_NOT_EXISTED);
+        }
 
         findMember.makeSessionId(sessionManager.makeSessionId());
         // 비밀번호 암호화
         String salt = findMember.getSalt();
         String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
 
-        if (findMember.getPassword().equals(hashedPassword))
+        if (findMember.getPassword().equals(hashedPassword)) {
             return new LoginResponse(NORMAL_OPERATION, findMember.getSessionId());
+        }
 
         return new LoginResponse(PASSWORD_IS_NOT_EXISTED);
     }
@@ -210,11 +228,12 @@ public class AuthenticationServiceImpl implements MemberService{
     @Transactional
     public StatusResponse logout(IdRequest request) {
         Member findMember = sessionManager.findBySessionId(request.getId());
-        if(isNull(findMember))
+        if (isNull(findMember)) {
             return new StatusResponse(MEMBER_IS_NOT_EXISTED);
+        }
 
         Location location = locationRepository.findById(findMember.getId()).orElse(null);
-        if(!isNull(location)) {
+        if (!isNull(location)) {
             Location newLocation = new Location(location.getId(), location.getCollege(),
                     location.getPoint(), false, location.getUpdateDate());
             locationRepository.save(newLocation);
@@ -226,12 +245,14 @@ public class AuthenticationServiceImpl implements MemberService{
     @Transactional
     public StatusResponse findId(FindIdRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
-        if (isNull(college))
+        if (isNull(college)) {
             return new StatusResponse(FindId.COLLEGE_IS_NOT_EXISTED);
+        }
 
         Member member = findByUEmailAndCollege(request.getUEmail(), college);
-        if (isNull(member))
+        if (isNull(member)) {
             return new StatusResponse(FindId.MEMBER_IS_NOT_EXISTED);
+        }
 
         mail(USER_ID_IS, member.getName(), member.getUEmail(), college.getDomain(), member.getLoginId());
         return new StatusResponse(NORMAL_OPERATION);
@@ -240,8 +261,9 @@ public class AuthenticationServiceImpl implements MemberService{
     @Transactional
     public StatusResponse findPassword(FindPasswordRequest request) {
         Member member = findByLoginId(request.getLoginId());
-        if (isNull(member))
+        if (isNull(member)) {
             return new StatusResponse(MEMBER_IS_NOT_EXISTED);
+        }
 
         // 비밀번호 암호화
         String randomPassword = randomPassword();
@@ -255,14 +277,16 @@ public class AuthenticationServiceImpl implements MemberService{
     @Transactional
     public StatusResponse transPassword(TransPasswordRequest request) {
         Member findMember = sessionManager.findBySessionId(request.getId());
-        if (isNull(findMember))
+        if (isNull(findMember)) {
             return new StatusResponse(TransPassword.MEMBER_IS_NOT_EXISTED);
+        }
 
         // 비밀번호 암호화
         String hashedCurrentPassword = BCrypt.hashpw(request.getCurrentPassword(), findMember.getSalt());
         if (findMember.getPassword().equals(hashedCurrentPassword)) {
-            if (isNotValidPassword(request.getNewPassword()))
+            if (isNotValidPassword(request.getNewPassword())) {
                 return new StatusResponse(PASSWORD_IS_INVALID);
+            }
 
             // 비밀번호 암호화
             String hashedNewPassword = BCrypt.hashpw(request.getNewPassword(), findMember.getSalt());
@@ -276,8 +300,9 @@ public class AuthenticationServiceImpl implements MemberService{
     public StatusResponse withdrawal(SessionIdRequest request) {
         Long sessionId = request.getId();
         Member member = sessionManager.findBySessionId(sessionId);
-        if (isNull(member))
+        if (isNull(member)) {
             return new StatusResponse(Withdrawal.MEMBER_IS_NOT_EXISTED);
+        }
 
         if (s3Uploader.deletePicture(member.getUrlCode())) {
             locationRepository.deleteById(member.getId());
@@ -295,16 +320,18 @@ public class AuthenticationServiceImpl implements MemberService{
     }
 
     private Boolean isExistedMember(String uEmail, MCollege college) {
-        if(isNull(findByUEmailAndCollege(uEmail, college)))
+        if (isNull(findByUEmailAndCollege(uEmail, college))) {
             return false;
+        }
         return true;
     }
 
     private Boolean isUsingMail(String eMail) {
         boolean isCertifyingMail = isExistedInCache(BEFORE_EMAIL, eMail);
         boolean isJoiningMail = isExistedInCache(AFTER_EMAIL, eMail);
-        if(isJoiningMail || isCertifyingMail)
+        if (isJoiningMail || isCertifyingMail) {
             return true;
+        }
         return false;
     }
 
@@ -329,8 +356,9 @@ public class AuthenticationServiceImpl implements MemberService{
     }
 
     private boolean isNotValidLoginId(String id) {
-        if (id.length() < 5 || id.length() > 20)
+        if (id.length() < 5 || id.length() > 20) {
             return true;
+        }
         String regex = "^[a-z0-9-_]+$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
@@ -393,8 +421,7 @@ public class AuthenticationServiceImpl implements MemberService{
         if (isNull(memberName)) {
             message.setSubject("[JoA] " + header + "를 확인하세요.");
             message.setText(header + "는 " + content + " 입니다.");
-        }
-        else {
+        } else {
             message.setSubject("[JoA] " + memberName + "님의 " + header + "를 확인하세요.");
             message.setText(memberName + "님의 " + header + "는 " + content + " 입니다.");
         }
@@ -426,15 +453,17 @@ public class AuthenticationServiceImpl implements MemberService{
 
     private Member findByUEmailAndCollege(String uEmail, MCollege college) {
         Member member = memberRepository.findByuEmailAndcollege(uEmail, college).orElse(null);
-        if (isNull(member))
+        if (isNull(member)) {
             return null;
+        }
         return member;
     }
 
     private Member findByLoginId(String loginId) {
         Member member = memberRepository.findByloginId(loginId).orElse(null);
-        if (isNull(member))
+        if (isNull(member)) {
             return null;
+        }
         return member;
     }
 }
