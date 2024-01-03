@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.log;
+package com.mjuAppSW.joA.common.log;
 
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnection;

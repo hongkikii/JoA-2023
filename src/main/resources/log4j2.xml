@@ -73,7 +73,7 @@
         </RollingFile>
 
         <JDBC name="dbLogger" tableName="Log">
-            <ConnectionFactory class="com.mjuAppSW.joA.log.ConnectionFactoryProd" method="getDatabaseConnection"/>
+            <ConnectionFactory class="com.mjuAppSW.joA.common.log.ConnectionFactoryProd" method="getDatabaseConnection"/>
             <Column name="log_id" pattern="%u" />
             <Column name="entry_date" isEventTimestamp="true" />
             <Column name="logger" pattern="%logger" />

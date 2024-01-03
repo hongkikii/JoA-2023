@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.log;
+package com.mjuAppSW.joA.common.log;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

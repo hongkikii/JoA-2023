@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.session;
+package com.mjuAppSW.joA.common.session;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;

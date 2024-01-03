@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.controller;
+package com.mjuAppSW.joA.common.controller;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
