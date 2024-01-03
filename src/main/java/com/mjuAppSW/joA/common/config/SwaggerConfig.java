@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.config;
+package com.mjuAppSW.joA.common.config;
 
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

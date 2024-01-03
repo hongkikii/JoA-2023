@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.data;
+package com.mjuAppSW.joA.common.data;
 
 import com.mjuAppSW.joA.domain.college.MCollege;
 import com.mjuAppSW.joA.domain.heart.Heart;
@@ -48,11 +48,11 @@ public class InitDevMysql {
 
         public void initCollege() {
             c1 = new MCollege(1L, "명지대학교", "@mju.ac.kr");
-//            c2 = new MCollege(2L, "애플대학교", "@icloud.com");
-//            c3 = new MCollege(3L, "네이버대학교", "@naver.com");
+            c2 = new MCollege(2L, "애플대학교", "@icloud.com");
+            c3 = new MCollege(3L, "네이버대학교", "@naver.com");
             em.persist(c1);
-//            em.persist(c2);
-//            em.persist(c3);
+            em.persist(c2);
+            em.persist(c3);
         }
 
         public void initVoteCategory() {

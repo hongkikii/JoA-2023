@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.data;
+package com.mjuAppSW.joA.common.data;
 
 import com.mjuAppSW.joA.domain.college.MCollege;
 import com.mjuAppSW.joA.domain.report.ReportCategory;

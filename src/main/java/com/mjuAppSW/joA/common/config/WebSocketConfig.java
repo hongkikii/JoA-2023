@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.config;
+package com.mjuAppSW.joA.common.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

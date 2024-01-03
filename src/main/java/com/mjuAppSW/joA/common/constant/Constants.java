@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.constant;
+package com.mjuAppSW.joA.common.constant;
 
 public class Constants {
 

@@ -1,6 +1,6 @@
-package com.mjuAppSW.joA.storage;
+package com.mjuAppSW.joA.common.storage;
 
-import static com.mjuAppSW.joA.constant.Constants.S3Uploader.ERROR;
+import static com.mjuAppSW.joA.common.constant.Constants.S3Uploader.ERROR;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;

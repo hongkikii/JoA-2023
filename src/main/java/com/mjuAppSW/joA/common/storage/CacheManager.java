@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.storage;
+package com.mjuAppSW.joA.common.storage;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
