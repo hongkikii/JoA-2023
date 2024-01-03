@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.member;
+package com.mjuAppSW.joA.domain.member.authentication;
 
 import static com.mjuAppSW.joA.constant.Constants.Auth;
 import static com.mjuAppSW.joA.constant.Constants.Auth.CERTIFY_NUMBER_IS_INVALID;
@@ -38,6 +38,8 @@ import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.domain.college.MCollege;
 import com.mjuAppSW.joA.domain.college.MCollegeRepository;
+import com.mjuAppSW.joA.domain.member.Member;
+import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.member.dto.FindIdRequest;
 import com.mjuAppSW.joA.domain.member.dto.FindPasswordRequest;
 import com.mjuAppSW.joA.domain.member.dto.IdRequest;
@@ -73,7 +75,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MemberServiceImpl implements MemberService{
+public class AuthenticationServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final MCollegeRepository mCollegeRepository;
     private final PCollegeRepository pCollegeRepository;

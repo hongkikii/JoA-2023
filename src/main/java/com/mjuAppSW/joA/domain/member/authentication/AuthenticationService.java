@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.member;
+package com.mjuAppSW.joA.domain.member.authentication;
 
 
 import com.mjuAppSW.joA.domain.member.dto.FindIdRequest;
@@ -14,15 +14,15 @@ import com.mjuAppSW.joA.domain.member.dto.UMailRequest;
 import com.mjuAppSW.joA.domain.member.dto.UMailResponse;
 import com.mjuAppSW.joA.domain.member.dto.UNumRequest;
 
-public interface MemberService {
+public interface AuthenticationService {
 
-    UMailResponse sendCertifyNum(UMailRequest request); // uEmail, collegeId
+    UMailResponse sendCertifyNum(UMailRequest request);
 
-    StatusResponse authCertifyNum(UNumRequest request); // id, certifyNum, (uEmail, collegeId)
+    StatusResponse authCertifyNum(UNumRequest request);
 
     StatusResponse verifyId(Long id, String loginId);
 
-    StatusResponse join(JoinRequest request); // id, loginId, name, password
+    StatusResponse join(JoinRequest request);
 
     LoginResponse login(LoginRequest request);
 

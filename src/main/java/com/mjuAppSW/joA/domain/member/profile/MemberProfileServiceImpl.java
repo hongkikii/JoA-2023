@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.memberProfile;
+package com.mjuAppSW.joA.domain.member.profile;
 
 import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
 import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
@@ -19,6 +19,7 @@ import com.mjuAppSW.joA.domain.member.dto.PictureRequest;
 import com.mjuAppSW.joA.domain.member.dto.SessionIdRequest;
 import com.mjuAppSW.joA.domain.member.dto.SetResponse;
 import com.mjuAppSW.joA.domain.member.dto.StatusResponse;
+import com.mjuAppSW.joA.domain.member.profile.MemberProfileService;
 import com.mjuAppSW.joA.domain.vote.VoteRepository;
 import com.mjuAppSW.joA.session.SessionManager;
 import com.mjuAppSW.joA.storage.S3Uploader;
