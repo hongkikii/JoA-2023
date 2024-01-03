@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.memberProfile;
+package com.mjuAppSW.joA.domain.member.profile;
 
 import com.mjuAppSW.joA.domain.member.dto.BioRequest;
 import com.mjuAppSW.joA.domain.member.dto.IdRequest;

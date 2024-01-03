@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.member;
+package com.mjuAppSW.joA.domain.member.authentication;
 
 import com.mjuAppSW.joA.domain.member.dto.FindIdRequest;
 import com.mjuAppSW.joA.domain.member.dto.FindPasswordRequest;
@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class MemberApiController {
+public class AuthenticationApiController {
 
-    private final MemberServiceImpl memberService;
+    private final AuthenticationServiceImpl memberService;
 
     @PostMapping("/mail/send")
     public ResponseEntity<UMailResponse> sendCertifyNum(@RequestBody @Valid UMailRequest request) {
