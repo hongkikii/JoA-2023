@@ -1,15 +1,15 @@
 package com.mjuAppSW.joA.domain.vote;
 
-import com.mjuAppSW.joA.domain.vote.dto.OwnerResponse;
-import com.mjuAppSW.joA.domain.vote.dto.SendRequest;
-import com.mjuAppSW.joA.domain.vote.dto.StatusResponse;
-import com.mjuAppSW.joA.domain.vote.dto.VoteListResponse;
+import com.mjuAppSW.joA.domain.vote.dto.response.VoteOwnerResponse;
+import com.mjuAppSW.joA.domain.vote.dto.request.SendVoteRequest;
+import com.mjuAppSW.joA.domain.vote.dto.response.StatusResponse;
+import com.mjuAppSW.joA.domain.vote.dto.response.VoteListResponse;
 
 public interface VoteService {
 
-    StatusResponse sendVote(SendRequest request); // giveId, takeId, categoryId, hint
+    StatusResponse sendVote(SendVoteRequest request); // giveId, takeId, categoryId, hint
 
     VoteListResponse getVotes(Long takeId);
 
-    OwnerResponse getOwnerInfo(Long id);
+    VoteOwnerResponse getVoteOwner(Long id);
 }

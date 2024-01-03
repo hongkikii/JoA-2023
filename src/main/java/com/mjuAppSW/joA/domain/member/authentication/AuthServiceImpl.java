@@ -1,64 +1,62 @@
 package com.mjuAppSW.joA.domain.member.authentication;
 
-import static com.mjuAppSW.joA.constant.Constants.Auth;
-import static com.mjuAppSW.joA.constant.Constants.Auth.CERTIFY_NUMBER_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.Auth.LOGIN_ID_IS_CACHED;
-import static com.mjuAppSW.joA.constant.Constants.Auth.LOGIN_ID_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Auth.LOGIN_ID_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.Auth.MAIL_IS_NOT_CACHED;
-import static com.mjuAppSW.joA.constant.Constants.Auth.SESSION_ID_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Cache.AFTER_CERTIFY_TIME;
-import static com.mjuAppSW.joA.constant.Constants.Cache.AFTER_EMAIL;
-import static com.mjuAppSW.joA.constant.Constants.Cache.AFTER_SAVE_LOGIN_ID_TIME;
-import static com.mjuAppSW.joA.constant.Constants.Cache.BEFORE_CERTIFY_TIME;
-import static com.mjuAppSW.joA.constant.Constants.Cache.BEFORE_EMAIL;
-import static com.mjuAppSW.joA.constant.Constants.Cache.CERTIFY_NUMBER;
-import static com.mjuAppSW.joA.constant.Constants.Cache.ID;
-import static com.mjuAppSW.joA.constant.Constants.EMAIL_SPLIT;
-import static com.mjuAppSW.joA.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.constant.Constants.FindId;
-import static com.mjuAppSW.joA.constant.Constants.Join;
-import static com.mjuAppSW.joA.constant.Constants.Login.LOGIN_ID_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Login.LOGIN_IS_ALREADY;
-import static com.mjuAppSW.joA.constant.Constants.Login.PASSWORD_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Logout.MEMBER_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.MAIL.CERTIFY_NUMBER_IS;
-import static com.mjuAppSW.joA.constant.Constants.MAIL.TEMPORARY_PASSWORD_IS;
-import static com.mjuAppSW.joA.constant.Constants.MAIL.USER_ID_IS;
-import static com.mjuAppSW.joA.constant.Constants.Member.COLLEGE_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.Member.MAIL_IS_USING;
-import static com.mjuAppSW.joA.constant.Constants.Member.MEMBER_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
-import static com.mjuAppSW.joA.constant.Constants.S3Uploader.S3_DELETE_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.TransPassword;
-import static com.mjuAppSW.joA.constant.Constants.TransPassword.PASSWORD_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.TransPassword.PASSWORD_IS_NOT_EQUAL;
-import static com.mjuAppSW.joA.constant.Constants.Withdrawal;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth.CERTIFY_NUMBER_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth.LOGIN_ID_IS_CACHED;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth.LOGIN_ID_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth.LOGIN_ID_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth.MAIL_IS_NOT_CACHED;
+import static com.mjuAppSW.joA.common.constant.Constants.Auth.SESSION_ID_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.AFTER_CERTIFY_TIME;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.AFTER_EMAIL;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.AFTER_SAVE_LOGIN_ID_TIME;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.BEFORE_CERTIFY_TIME;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.BEFORE_EMAIL;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.CERTIFY_NUMBER;
+import static com.mjuAppSW.joA.common.constant.Constants.Cache.ID;
+import static com.mjuAppSW.joA.common.constant.Constants.EMAIL_SPLIT;
+import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
+import static com.mjuAppSW.joA.common.constant.Constants.FindId;
+import static com.mjuAppSW.joA.common.constant.Constants.Join;
+import static com.mjuAppSW.joA.common.constant.Constants.Login.LOGIN_ID_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Login.PASSWORD_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Logout.MEMBER_IS_NOT_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.MAIL.CERTIFY_NUMBER_IS;
+import static com.mjuAppSW.joA.common.constant.Constants.MAIL.TEMPORARY_PASSWORD_IS;
+import static com.mjuAppSW.joA.common.constant.Constants.MAIL.USER_ID_IS;
+import static com.mjuAppSW.joA.common.constant.Constants.Member.COLLEGE_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.Member.MAIL_IS_USING;
+import static com.mjuAppSW.joA.common.constant.Constants.Member.MEMBER_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
+import static com.mjuAppSW.joA.common.constant.Constants.S3Uploader.S3_DELETE_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.TransPassword;
+import static com.mjuAppSW.joA.common.constant.Constants.TransPassword.PASSWORD_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.TransPassword.PASSWORD_IS_NOT_EQUAL;
+import static com.mjuAppSW.joA.common.constant.Constants.Withdrawal;
 import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.domain.college.MCollege;
 import com.mjuAppSW.joA.domain.college.MCollegeRepository;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.dto.FindIdRequest;
-import com.mjuAppSW.joA.domain.member.dto.FindPasswordRequest;
-import com.mjuAppSW.joA.domain.member.dto.IdRequest;
-import com.mjuAppSW.joA.domain.member.dto.JoinRequest;
-import com.mjuAppSW.joA.domain.member.dto.LoginRequest;
-import com.mjuAppSW.joA.domain.member.dto.LoginResponse;
-import com.mjuAppSW.joA.domain.member.dto.SessionIdRequest;
-import com.mjuAppSW.joA.domain.member.dto.StatusResponse;
-import com.mjuAppSW.joA.domain.member.dto.TransPasswordRequest;
-import com.mjuAppSW.joA.domain.member.dto.UMailRequest;
-import com.mjuAppSW.joA.domain.member.dto.UMailResponse;
-import com.mjuAppSW.joA.domain.member.dto.UNumRequest;
+import com.mjuAppSW.joA.domain.member.dto.request.FindIdRequest;
+import com.mjuAppSW.joA.domain.member.dto.request.FindPasswordRequest;
+import com.mjuAppSW.joA.domain.member.dto.request.JoinRequest;
+import com.mjuAppSW.joA.domain.member.dto.request.LoginRequest;
+import com.mjuAppSW.joA.domain.member.dto.response.LoginResponse;
+import com.mjuAppSW.joA.domain.member.dto.request.SessionIdRequest;
+import com.mjuAppSW.joA.domain.member.dto.response.StatusResponse;
+import com.mjuAppSW.joA.domain.member.dto.request.TransPasswordRequest;
+import com.mjuAppSW.joA.domain.member.dto.request.SendCertifyNumRequest;
+import com.mjuAppSW.joA.domain.member.dto.response.SendCertifyNumResponse;
+import com.mjuAppSW.joA.domain.member.dto.request.VerifyCertifyNumRequest;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
 import com.mjuAppSW.joA.geography.location.Location;
 import com.mjuAppSW.joA.geography.location.LocationRepository;
-import com.mjuAppSW.joA.session.SessionManager;
-import com.mjuAppSW.joA.storage.CacheManager;
-import com.mjuAppSW.joA.storage.S3Uploader;
+import com.mjuAppSW.joA.common.session.SessionManager;
+import com.mjuAppSW.joA.common.storage.CacheManager;
+import com.mjuAppSW.joA.common.storage.S3Uploader;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
 import java.util.Optional;
@@ -75,7 +73,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class AuthServiceImpl implements AuthService {
 
     private final MemberRepository memberRepository;
     private final MCollegeRepository mCollegeRepository;
@@ -86,28 +84,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final CacheManager cacheManager;
     private final S3Uploader s3Uploader;
 
-    public UMailResponse sendCertifyNum(UMailRequest request) {
+    public SendCertifyNumResponse sendCertifyNum(SendCertifyNumRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
         if (isNull(college)) {
-            return new UMailResponse(COLLEGE_IS_INVALID);
+            return new SendCertifyNumResponse(COLLEGE_IS_INVALID);
         }
 
         if (isExistedMember(request.getUEmail(), college)) {
-            return new UMailResponse(MEMBER_IS_EXISTED);
+            return new SendCertifyNumResponse(MEMBER_IS_EXISTED);
         }
 
         String eMail = request.getUEmail() + college.getDomain();
         if (isUsingMail(eMail)) {
-            return new UMailResponse(MAIL_IS_USING);
+            return new SendCertifyNumResponse(MAIL_IS_USING);
         }
 
         long sessionId = sessionManager.makeSessionId();
         String certifyNum = cacheCertifyNumAndEmail(sessionId, eMail);
         sendCertifyNumMail(request.getUEmail(), college.getDomain(), certifyNum);
-        return new UMailResponse(NORMAL_OPERATION, sessionId);
+        return new SendCertifyNumResponse(NORMAL_OPERATION, sessionId);
     }
 
-    public StatusResponse authCertifyNum(UNumRequest request) {
+    public StatusResponse verifyCertifyNum(VerifyCertifyNumRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
         if (isNull(college)) {
             return new StatusResponse(Auth.COLLEGE_IS_NOT_EXISTED);
@@ -226,7 +224,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Transactional
-    public StatusResponse logout(IdRequest request) {
+    public StatusResponse logout(SessionIdRequest request) {
         Member findMember = sessionManager.findBySessionId(request.getId());
         if (isNull(findMember)) {
             return new StatusResponse(MEMBER_IS_NOT_EXISTED);

@@ -1,22 +1,22 @@
 package com.mjuAppSW.joA.domain.vote;
 
-import static com.mjuAppSW.joA.constant.Constants.NORMAL_OPERATION;
-import static com.mjuAppSW.joA.constant.Constants.Vote.BLOCK_IS_EXISTED;
-import static com.mjuAppSW.joA.constant.Constants.Vote.GIVE_MEMBER_CANNOT_SEND_TO_OPPONENT;
-import static com.mjuAppSW.joA.constant.Constants.Vote.MEMBER_IS_INVALID;
-import static com.mjuAppSW.joA.constant.Constants.Vote.VOTE_CATEGORY_IS_NOT_VALID;
-import static com.mjuAppSW.joA.constant.Constants.Vote.VOTE_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
+import static com.mjuAppSW.joA.common.constant.Constants.Vote.BLOCK_IS_EXISTED;
+import static com.mjuAppSW.joA.common.constant.Constants.Vote.GIVE_MEMBER_CANNOT_SEND_TO_OPPONENT;
+import static com.mjuAppSW.joA.common.constant.Constants.Vote.MEMBER_IS_INVALID;
+import static com.mjuAppSW.joA.common.constant.Constants.Vote.VOTE_CATEGORY_IS_NOT_VALID;
+import static com.mjuAppSW.joA.common.constant.Constants.Vote.VOTE_IS_EXISTED;
 import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberAccessor;
-import com.mjuAppSW.joA.domain.vote.dto.OwnerResponse;
-import com.mjuAppSW.joA.domain.vote.dto.SendRequest;
-import com.mjuAppSW.joA.domain.vote.dto.StatusResponse;
-import com.mjuAppSW.joA.domain.vote.dto.VoteContent;
-import com.mjuAppSW.joA.domain.vote.dto.VoteListResponse;
-import com.mjuAppSW.joA.domain.voteCategory.VoteCategory;
-import com.mjuAppSW.joA.domain.voteCategory.VoteCategoryRepository;
+import com.mjuAppSW.joA.domain.vote.dto.response.VoteOwnerResponse;
+import com.mjuAppSW.joA.domain.vote.dto.request.SendVoteRequest;
+import com.mjuAppSW.joA.domain.vote.dto.response.StatusResponse;
+import com.mjuAppSW.joA.domain.vote.dto.response.VoteContent;
+import com.mjuAppSW.joA.domain.vote.dto.response.VoteListResponse;
+import com.mjuAppSW.joA.domain.vote.voteCategory.VoteCategory;
+import com.mjuAppSW.joA.domain.vote.voteCategory.VoteCategoryRepository;
 import com.mjuAppSW.joA.geography.block.Block;
 import com.mjuAppSW.joA.geography.block.BlockRepository;
 import jakarta.transaction.Transactional;
@@ -39,7 +39,7 @@ public class VoteServiceImpl implements VoteService {
     private final MemberAccessor memberAccessor;
 
     @Transactional
-    public StatusResponse sendVote(SendRequest request) {
+    public StatusResponse sendVote(SendVoteRequest request) {
         Member giveMember = memberAccessor.findBySessionId(request.getGiveId());
         Member takeMember = memberAccessor.findById(request.getTakeId());
         VoteCategory voteCategory = findVoteCategoryById(request.getCategoryId());
@@ -79,11 +79,11 @@ public class VoteServiceImpl implements VoteService {
         return new VoteListResponse(voteList);
     }
 
-    public OwnerResponse getOwnerInfo(Long id) {
-        Member findMember = memberAccessor.findBySessionId(id);
+    public VoteOwnerResponse getVoteOwner(Long sessionId) {
+        Member findMember = memberAccessor.findBySessionId(sessionId);
         if(findMember == null)
-            return new OwnerResponse(1);
-        return new OwnerResponse(NORMAL_OPERATION, findMember.getName(), findMember.getUrlCode());
+            return new VoteOwnerResponse(1);
+        return new VoteOwnerResponse(NORMAL_OPERATION, findMember.getName(), findMember.getUrlCode());
     }
 
     private List<VoteContent> getVoteList(Long id) {
