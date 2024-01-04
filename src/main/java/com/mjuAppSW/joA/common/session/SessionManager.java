@@ -2,6 +2,8 @@ package com.mjuAppSW.joA.common.session;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
+import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
+import com.mjuAppSW.joA.domain.member.exception.MemberNotExistedException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,12 +25,6 @@ public class SessionManager {
         return ThreadLocalRandom.current().nextLong(min, max + 1);
     }
 
-    public Member findBySessionId(Long sessionId) {
-        Member member = memberRepository.findBysessionId(sessionId).orElse(null);
-        if (member == null || member.getIsWithdrawal()) return null;
-        return member;
-    }
-
     @Transactional
     @Scheduled(cron = "0 0 0 1 * ?")
     public void expiredSessionId() {
@@ -36,5 +32,19 @@ public class SessionManager {
         for (Member member : members) {
             member.makeSessionId(makeSessionId());
         }
+    }
+
+    public Member findBySessionId(Long sessionId) {
+        return memberRepository.findBysessionId(sessionId)
+                .filter(member -> {
+                    if (member.getIsWithdrawal()) {
+                        throw new MemberNotExistedException();
+                    }
+                    if (member.getStatus() == 1 || member.getStatus() == 2) {
+                        throw new AccessForbiddenException();
+                    }
+                    return true;
+                })
+                .orElseThrow(MemberNotExistedException::new);
     }
 }
