@@ -1,6 +1,6 @@
 package com.mjuAppSW.joA.geography.college;
 
-import com.mjuAppSW.joA.geography.location.dto.request.PolygonRequest;
+import com.mjuAppSW.joA.geography.college.dto.PolygonRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
