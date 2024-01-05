@@ -13,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 public class SendVoteRequest {
     @NotNull
-    private Long giveId;
+    private final Long giveId;
     @NotNull
-    private Long takeId;
+    private final Long takeId;
     @NotNull
-    private Long categoryId;
+    private final Long categoryId;
     @Size(max = 15)
-    private String hint;
+    private final String hint;
 }
