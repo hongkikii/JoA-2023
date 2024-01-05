@@ -3,7 +3,7 @@ package com.mjuAppSW.joA.common.session;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotExistedException;
+import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,13 +38,13 @@ public class SessionManager {
         return memberRepository.findBysessionId(sessionId)
                 .filter(member -> {
                     if (member.getIsWithdrawal()) {
-                        throw new MemberNotExistedException();
+                        throw new MemberNotFoundException();
                     }
                     if (member.getStatus() == 1 || member.getStatus() == 2) {
                         throw new AccessForbiddenException();
                     }
                     return true;
                 })
-                .orElseThrow(MemberNotExistedException::new);
+                .orElseThrow(MemberNotFoundException::new);
     }
 }

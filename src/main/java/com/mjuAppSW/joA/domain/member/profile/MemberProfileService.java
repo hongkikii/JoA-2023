@@ -8,7 +8,6 @@ import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.dto.request.BioRequest;
 import com.mjuAppSW.joA.domain.member.dto.response.MyPageResponse;
 import com.mjuAppSW.joA.domain.member.dto.request.PictureRequest;
-import com.mjuAppSW.joA.domain.member.dto.request.SessionIdRequest;
 import com.mjuAppSW.joA.domain.member.dto.response.SettingPageResponse;
 import com.mjuAppSW.joA.domain.member.exception.S3InvalidException;
 import com.mjuAppSW.joA.domain.vote.VoteRepository;
@@ -32,12 +31,7 @@ public class MemberProfileService {
 
     public SettingPageResponse getSettingPage(Long sessionId) {
         Member member = sessionManager.findBySessionId(sessionId);
-
-        String urlCode = EMPTY_STRING;
-        if (!member.getBasicProfile())
-            urlCode = member.getUrlCode();
-
-        return new SettingPageResponse(member.getName(), urlCode);
+        return SettingPageResponse.of(member);
     }
 
     public MyPageResponse getMyPage(Long sessionId) {
@@ -47,16 +41,7 @@ public class MemberProfileService {
         int totalHeart = heartRepository.countTotalHeartsById(member.getId());
         List<String> voteTop3 = voteRepository.findVoteCategoryById(member.getId(), PageRequest.of(0, 3));
 
-        String urlCode = EMPTY_STRING;
-        if (!member.getBasicProfile())
-            urlCode = member.getUrlCode();
-
-        return MyPageResponse.builder().name(member.getName())
-                                    .bio(member.getBio())
-                                    .urlCode(urlCode)
-                                    .todayHeart(todayHeart)
-                                    .totalHeart(totalHeart)
-                                    .voteTop3(voteTop3).build();
+        return MyPageResponse.of(member, todayHeart, totalHeart, voteTop3);
     }
 
     @Transactional
@@ -66,8 +51,8 @@ public class MemberProfileService {
     }
 
     @Transactional
-    public void deleteBio(SessionIdRequest request) {
-        Member member = sessionManager.findBySessionId(request.getId());
+    public void deleteBio(Long sessionId) {
+        Member member = sessionManager.findBySessionId(sessionId);
         member.changeBio(EMPTY_STRING);
     }
 
@@ -75,7 +60,7 @@ public class MemberProfileService {
     public void transPicture(PictureRequest request) {
         Member member = sessionManager.findBySessionId(request.getId());
 
-        if (!member.getBasicProfile())
+        if (!isBasicImage(member.getUrlCode()))
             s3Uploader.deletePicture(member.getUrlCode());
 
         String newUrlCode = s3Uploader.putPicture(member.getId(), request.getBase64Picture());
@@ -83,16 +68,20 @@ public class MemberProfileService {
             throw new S3InvalidException();
 
         member.changeUrlCode(newUrlCode);
-        member.changeBasicProfile(false);
     }
 
     @Transactional
-    public void deletePicture(SessionIdRequest request) {
-        Member member = sessionManager.findBySessionId(request.getId());
-        if(member.getBasicProfile()) return;
+    public void deletePicture(Long sessionId) {
+        Member member = sessionManager.findBySessionId(sessionId);
+        if(isBasicImage(member.getUrlCode())) return;
 
         s3Uploader.deletePicture(member.getUrlCode());
         member.changeUrlCode(EMPTY_STRING);
-        member.changeBasicProfile(true);
+    }
+
+    private boolean isBasicImage(String urlCode) {
+        if(urlCode.equals(EMPTY_STRING))
+            return true;
+        return false;
     }
 }
