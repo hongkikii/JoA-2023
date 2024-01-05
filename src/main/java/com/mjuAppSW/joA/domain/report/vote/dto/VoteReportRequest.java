@@ -1,21 +1,19 @@
 package com.mjuAppSW.joA.domain.report.vote.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Schema(description = "투표 신고 Request")
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class VoteReportRequest {
-    @JsonProperty("voteId")
     @NotNull
     private Long voteId;
-
-    @JsonProperty("reportId")
     @NotNull
     private Long reportId;
-
-    @JsonProperty("content")
     private String content;
 }
