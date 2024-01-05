@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 public class VoteReportRequest {
     @NotNull
-    private Long voteId;
+    private final Long voteId;
     @NotNull
-    private Long reportId;
-    private String content;
+    private final Long reportId;
+    private final String content;
 }

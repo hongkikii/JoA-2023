@@ -12,9 +12,9 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 public class HeartRequest {
     @NotNull
-    private Long giveId;
+    private final Long giveId;
     @NotNull
-    private Long takeId;
+    private final Long takeId;
     @NotNull
-    private Boolean named;
+    private final Boolean named;
 }

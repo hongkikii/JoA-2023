@@ -2,7 +2,7 @@ package com.mjuAppSW.joA.domain.report.vote;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.MemberNotFoundException;
 import com.mjuAppSW.joA.domain.report.ReportCategory;
 import com.mjuAppSW.joA.domain.report.ReportCategoryRepository;
 import com.mjuAppSW.joA.domain.report.vote.dto.VoteReportRequest;
