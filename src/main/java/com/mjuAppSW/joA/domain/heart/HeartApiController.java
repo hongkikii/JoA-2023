@@ -26,6 +26,7 @@ public class HeartApiController {
 
     @Operation(summary = "하트 전송", description = "하트 전송 API")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "하트 송신자, 수신자 정보 및 매칭 여부 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "B001: 차단 조치가 이루어진 계정입니다."),
             @ApiResponse(responseCode = "409", description = "H001: 이미 하트가 존재합니다."),
