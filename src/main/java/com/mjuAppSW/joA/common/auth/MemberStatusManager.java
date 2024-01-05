@@ -1,7 +1,9 @@
-package com.mjuAppSW.joA.domain.member;
+package com.mjuAppSW.joA.common.auth;
 
 import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
 
+import com.mjuAppSW.joA.domain.member.Member;
+import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.geography.location.LocationRepository;
 import com.mjuAppSW.joA.common.storage.S3Uploader;
 import jakarta.transaction.Transactional;
@@ -79,7 +81,6 @@ public class MemberStatusManager {
         member.expireSessionId();
         member.changeWithdrawal(true);
         member.changeStatus(3);
-        member.changeBasicProfile(true);
         member.changeUrlCode(EMPTY_STRING);
         locationRepository.deleteById(member.getId());
         s3Uploader.deletePicture(member.getUrlCode());
