@@ -1,5 +1,6 @@
 package com.mjuAppSW.joA.domain.vote;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.geography.block.exception.BlockAccessForbiddenException;
 import com.mjuAppSW.joA.domain.member.Member;
@@ -32,13 +33,12 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final VoteCategoryRepository voteCategoryRepository;
     private final BlockRepository blockRepository;
-    private final MemberRepository memberRepository;
-    private final SessionManager sessionManager;
+    private final MemberChecker memberChecker;
 
     @Transactional
     public void sendVote(SendVoteRequest request) {
-        Member giveMember = sessionManager.findBySessionId(request.getGiveId());
-        Member takeMember = memberRepository.findById(request.getTakeId()).orElseThrow(MemberNotFoundException::new);
+        Member giveMember = memberChecker.findBySessionId(request.getGiveId());
+        Member takeMember = memberChecker.findById(request.getTakeId());
         VoteCategory voteCategory = findVoteCategoryById(request.getCategoryId());
 
         Long giveMemberId = giveMember.getId();
@@ -53,12 +53,12 @@ public class VoteService {
     }
 
     public VoteListResponse getVotes(Long sessionId) {
-        Member findTakeMember = sessionManager.findBySessionId(sessionId);
+        Member findTakeMember = memberChecker.findBySessionId(sessionId);
         return VoteListResponse.of(getVoteList(findTakeMember.getId()));
     }
 
     public VoteOwnerResponse getVoteOwner(Long sessionId) {
-        return VoteOwnerResponse.of(sessionManager.findBySessionId(sessionId));
+        return VoteOwnerResponse.of(memberChecker.findBySessionId(sessionId));
     }
 
     private VoteCategory findVoteCategoryById(Long id) {

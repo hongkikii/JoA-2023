@@ -1,5 +1,6 @@
 package com.mjuAppSW.joA.domain.heart;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.domain.heart.dto.HeartRequest;
 import com.mjuAppSW.joA.domain.heart.dto.HeartResponse;
@@ -25,15 +26,14 @@ public class HeartService {
     private final HeartRepository heartRepository;
     private final RoomInMemberRepository roomInMemberRepository;
     private final BlockRepository blockRepository;
-    private final MemberRepository memberRepository;
-    private final SessionManager sessionManager;
+    private final MemberChecker memberChecker;
 
     @Transactional
     public HeartResponse sendHeart(HeartRequest request) {
-        Member giveMember = sessionManager.findBySessionId(request.getGiveId());
+        Member giveMember = memberChecker.findBySessionId(request.getGiveId());
         Long giveMemberId = giveMember.getId();
         Long takeMemberId = request.getTakeId();
-        Member takeMember = memberRepository.findById(takeMemberId).orElseThrow(MemberNotFoundException::new);
+        Member takeMember = memberChecker.findById(takeMemberId);
 
         checkBlock(giveMemberId, takeMemberId);
         checkEqualHeart(giveMemberId, takeMemberId);

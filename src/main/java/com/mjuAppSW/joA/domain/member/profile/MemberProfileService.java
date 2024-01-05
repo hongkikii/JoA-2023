@@ -3,6 +3,7 @@ package com.mjuAppSW.joA.domain.member.profile;
 import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
 import static com.mjuAppSW.joA.common.constant.Constants.S3Uploader.ERROR;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.dto.request.BioRequest;
@@ -26,16 +27,16 @@ public class MemberProfileService {
 
     private final HeartRepository heartRepository;
     private final VoteRepository voteRepository;
-    private final SessionManager sessionManager;
+    private final MemberChecker memberChecker;
     private final S3Uploader s3Uploader;
 
     public SettingPageResponse getSettingPage(Long sessionId) {
-        Member member = sessionManager.findBySessionId(sessionId);
+        Member member = memberChecker.findBySessionId(sessionId);
         return SettingPageResponse.of(member);
     }
 
     public MyPageResponse getMyPage(Long sessionId) {
-        Member member = sessionManager.findBySessionId(sessionId);
+        Member member = memberChecker.findBySessionId(sessionId);
 
         int todayHeart = heartRepository.countTodayHeartsById(LocalDate.now(), member.getId());
         int totalHeart = heartRepository.countTotalHeartsById(member.getId());
@@ -46,19 +47,19 @@ public class MemberProfileService {
 
     @Transactional
     public void transBio(BioRequest request) {
-        Member member = sessionManager.findBySessionId(request.getId());
+        Member member = memberChecker.findBySessionId(request.getId());
         member.changeBio(request.getBio());
     }
 
     @Transactional
     public void deleteBio(Long sessionId) {
-        Member member = sessionManager.findBySessionId(sessionId);
+        Member member = memberChecker.findBySessionId(sessionId);
         member.changeBio(EMPTY_STRING);
     }
 
     @Transactional
     public void transPicture(PictureRequest request) {
-        Member member = sessionManager.findBySessionId(request.getId());
+        Member member = memberChecker.findBySessionId(request.getId());
 
         if (!isBasicImage(member.getUrlCode()))
             s3Uploader.deletePicture(member.getUrlCode());
@@ -72,7 +73,7 @@ public class MemberProfileService {
 
     @Transactional
     public void deletePicture(Long sessionId) {
-        Member member = sessionManager.findBySessionId(sessionId);
+        Member member = memberChecker.findBySessionId(sessionId);
         if(isBasicImage(member.getUrlCode())) return;
 
         s3Uploader.deletePicture(member.getUrlCode());

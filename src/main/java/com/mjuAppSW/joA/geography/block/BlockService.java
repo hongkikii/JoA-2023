@@ -1,5 +1,6 @@
 package com.mjuAppSW.joA.geography.block;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.geography.block.exception.BlockAccessForbiddenException;
 import com.mjuAppSW.joA.domain.member.Member;
@@ -18,11 +19,11 @@ public class BlockService {
 
     private final BlockRepository blockRepository;
     private final LocationRepository locationRepository;
-    private final SessionManager sessionManager;
+    private final MemberChecker memberChecker;
 
     @Transactional
     public void block(BlockRequest request) {
-        Member blockerMember = sessionManager.findBySessionId(request.getBlockerId());
+        Member blockerMember = memberChecker.findBySessionId(request.getBlockerId());
 
         Location blockerLocation = locationRepository.findById(blockerMember.getId())
                 .orElseThrow(LocationNotFoundException::new);
