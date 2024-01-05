@@ -1,36 +1,23 @@
 package com.mjuAppSW.joA.geography.location.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@NoArgsConstructor
 @Getter
-@Schema(description = "사용자 위치 업데이트 Request")
+@Schema(description = "사용자 위치 업데이트 request")
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class UpdateRequest {
 
-    @JsonProperty("id")
     @NotNull
-    private Long id;
-
-    @JsonProperty("latitude")
+    private final Long id;
     @NotNull
-    private Double latitude;
-
-    @JsonProperty("longitude")
+    private final Double latitude;
     @NotNull
-    private Double longitude;
-
-    @JsonProperty("altitude")
+    private final Double longitude;
     @NotNull
-    private Double altitude;
-
-    public UpdateRequest(Long id, Double latitude, Double longitude, Double altitude) {
-        this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.altitude = altitude;
-    }
+    private final Double altitude;
 }

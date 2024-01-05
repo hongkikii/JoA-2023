@@ -28,6 +28,7 @@ public enum ErrorCode {
 
     // PCollege
     COLLEGE_NOT_FOUND(404,"P001" , "학교 정보를 찾을 수 없습니다."),
+    OUT_OF_COLLEGE(409, "P002", "사용자가 학교 밖에 위치합니다."),
 
     // Room
     ROOM_EXISTED(409, "R001", "이미 채팅방이 존재합니다."),
