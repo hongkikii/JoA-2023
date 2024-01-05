@@ -3,7 +3,7 @@ package com.mjuAppSW.joA.domain.heart;
 import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.domain.heart.dto.HeartRequest;
 import com.mjuAppSW.joA.domain.heart.dto.HeartResponse;
-import com.mjuAppSW.joA.domain.heart.exception.BlockExistedException;
+import com.mjuAppSW.joA.geography.block.exception.BlockAccessForbiddenException;
 import com.mjuAppSW.joA.domain.heart.exception.HeartAlreadyExistedException;
 import com.mjuAppSW.joA.domain.heart.exception.RoomExistedException;
 import com.mjuAppSW.joA.domain.member.Member;
@@ -49,7 +49,7 @@ public class HeartService {
 
     private void checkBlock(Long giveMemberId, Long takeMemberId) {
         if (!blockRepository.findBlockByIds(takeMemberId, giveMemberId).isEmpty()) {
-            throw new BlockExistedException();
+            throw new BlockAccessForbiddenException();
         }
     }
 
