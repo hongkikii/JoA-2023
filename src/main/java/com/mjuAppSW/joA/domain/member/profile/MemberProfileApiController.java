@@ -58,9 +58,9 @@ public class MemberProfileApiController {
                 .asHttp(HttpStatus.OK);
     }
 
-    @Operation(summary = "한 줄 소개 변경", description = "사용자 한 줄 소개 변경 API")
+    @Operation(summary = "한 줄 소개 변경", description = "한 줄 소개 변경 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "한 줄 소개 변경 확인 코드 반환"),
+            @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다."),
             @ApiResponse(responseCode = "500", description = "M003: 이미지 업로드에 실패하였습니다."),
@@ -73,7 +73,7 @@ public class MemberProfileApiController {
 
     @Operation(summary = "한 줄 소개 삭제", description = "한 줄 소개 삭제 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "한 줄 소개 삭제 확인 코드 반환"),
+            @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
@@ -85,7 +85,7 @@ public class MemberProfileApiController {
 
     @Operation(summary = "프로필 사진 변경", description = "프로필 사진 변경 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "프로필 사진 변경 확인 코드 반환"),
+            @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
@@ -97,7 +97,7 @@ public class MemberProfileApiController {
 
     @Operation(summary = "프로필 사진 삭제", description = "프로필 사진 삭제 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "프로필 사진 삭제 확인 코드 반환"),
+            @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
