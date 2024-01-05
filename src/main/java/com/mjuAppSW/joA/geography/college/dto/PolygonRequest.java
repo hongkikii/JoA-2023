@@ -3,26 +3,30 @@ package com.mjuAppSW.joA.geography.college.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Schema(description = "학교 범위 등록 Request")
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class PolygonRequest {
     @NotNull
-    private Long collegeId;
+    private final Long collegeId;
     @NotNull
-    private Double topLeftLng;
+    private final Double topLeftLng;
     @NotNull
-    private Double topLeftLat;
+    private final Double topLeftLat;
     @NotNull
-    private Double topRightLng;
+    private final Double topRightLng;
     @NotNull
-    private Double topRightLat;
+    private final Double topRightLat;
     @NotNull
-    private Double bottomRightLng;
+    private final Double bottomRightLng;
     @NotNull
-    private Double bottomRightLat;
+    private final Double bottomRightLat;
     @NotNull
-    private Double bottomLeftLng;
+    private final Double bottomLeftLng;
     @NotNull
-    private Double bottomLeftLat;
+    private final Double bottomLeftLat;
 }
