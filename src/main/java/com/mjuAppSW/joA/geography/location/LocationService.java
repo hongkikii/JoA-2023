@@ -1,35 +1,29 @@
 package com.mjuAppSW.joA.geography.location;
 
 import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.common.constant.Constants.GeographyInfo;
-import static com.mjuAppSW.joA.common.constant.Constants.GeographyList;
-import static com.mjuAppSW.joA.common.constant.Constants.GeographyUpdate.COLLEGE_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.GeographyUpdate.MEMBER_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.GeographyUpdate.MEMBER_IS_STOPPED;
 import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
 import static java.util.Objects.isNull;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
+import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.domain.heart.Heart;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.MemberAccessor;
-import com.mjuAppSW.joA.geography.block.Block;
-import com.mjuAppSW.joA.geography.block.BlockRepository;
-import com.mjuAppSW.joA.geography.block.dto.BlockRequest;
-import com.mjuAppSW.joA.geography.block.dto.StatusResponse;
+import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
+import com.mjuAppSW.joA.geography.block.exception.LocationNotFoundException;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
 import com.mjuAppSW.joA.geography.location.dto.response.NearByInfo;
 import com.mjuAppSW.joA.geography.location.dto.response.NearByListResponse;
 import com.mjuAppSW.joA.geography.location.dto.response.OwnerResponse;
-import com.mjuAppSW.joA.geography.location.dto.request.PolygonRequest;
 import com.mjuAppSW.joA.geography.location.dto.request.UpdateRequest;
 import com.mjuAppSW.joA.geography.location.dto.response.UpdateResponse;
+import com.mjuAppSW.joA.geography.location.exception.AccessStoppedException;
+import com.mjuAppSW.joA.geography.location.exception.CollegeNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -39,33 +33,23 @@ import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LocationServiceImpl implements LocationService {
+public class LocationService {
 
     private final LocationRepository locationRepository;
     private final PCollegeRepository pCollegeRepository;
-    private final BlockRepository blockRepository;
     private final HeartRepository heartRepository;
+    private final MemberChecker memberChecker;
 
     @Transactional
     public UpdateResponse updateLocation(UpdateRequest request) {
-        Member member = memberAccessor.findBySessionId(request.getId());
-        if(isNull(member))
-            return new UpdateResponse(MEMBER_IS_INVALID, null);
-
+        Member member = memberChecker.findBySessionId(request.getId());
         Location location = findLocationById(member.getId());
-        if(isNull(location))
-            return new UpdateResponse(MEMBER_IS_INVALID, null);
-
         PCollege college = findCollegeById(location.getCollege().getCollegeId());
-        if(isNull(college))
-            return new UpdateResponse(COLLEGE_IS_INVALID, null);
 
-        if (memberAccessor.isStopped(member.getSessionId()))
-            return new UpdateResponse(MEMBER_IS_STOPPED, null);
+        memberChecker.checkStopped(member);
 
         boolean isContained = isPointWithinPolygon
                 (request.getLatitude(), request.getLongitude(), college.getPolygonField());
@@ -77,11 +61,11 @@ public class LocationServiceImpl implements LocationService {
     }
 
     public NearByListResponse getNearByList(UpdateRequest request) {
-        Member member = memberAccessor.findBySessionId(request.getId());
+        Member member = memberChecker.findBySessionId(request.getId());
         if(isNull(member))
             return new NearByListResponse(GeographyList.MEMBER_IS_INVALID);
 
-        if (memberAccessor.isStopped(member.getSessionId()))
+        if (memberChecker.checkStopped(member.getSessionId());)
             return new NearByListResponse(GeographyList.MEMBER_IS_STOPPED);
 
         Location location = findLocationById(member.getId());
@@ -98,7 +82,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     public OwnerResponse getOwner(Long sessionId) {
-        Member findMember = memberAccessor.findBySessionId(sessionId);
+        Member findMember = memberChecker.findBySessionId(sessionId);
         if(isNull(findMember))
             return OwnerResponse.builder()
                                 .status(GeographyInfo.MEMBER_IS_INVALID)
@@ -112,43 +96,12 @@ public class LocationServiceImpl implements LocationService {
                             .build();
     }
 
-    @Transactional
-    public StatusResponse block(BlockRequest request) {
-        Member blockerMember = memberAccessor.findBySessionId(request.getBlockerId());
-        if (isNull(blockerMember)) {
-            return new StatusResponse(1);
-        }
-        Location blockerLocation = locationRepository.findById(blockerMember.getId()).orElse(null);
-        Location blockedLocation = locationRepository.findById(request.getBlockedId()).orElse(null);
-
-        if (isNull(blockerLocation) || isNull(blockedLocation)) {
-            return new StatusResponse(1);
-        }
-
-        Optional<Block> equalBlock = blockRepository.findEqualBlock(blockerLocation.getId(), blockedLocation.getId());
-        if (equalBlock.isPresent()) {
-            return new StatusResponse(2);
-        }
-
-        Block saveBlock = new Block(blockerLocation, blockedLocation);
-        blockRepository.save(saveBlock);
-        return new StatusResponse(0);
-    }
-
-    @Transactional
-    public void setPolygon(PolygonRequest request) {
-        Polygon polygon = makePolygon(request);
-
-        PCollege college = new PCollege(request.getCollegeId(), polygon);
-        pCollegeRepository.save(college);
-    }
-
     private Location findLocationById(Long id) {
-        return locationRepository.findById(id).orElse(null);
+        return locationRepository.findById(id).orElseThrow(LocationNotFoundException::new);
     }
 
     private PCollege findCollegeById(Long id) {
-        return pCollegeRepository.findById(id).orElse(null);
+        return pCollegeRepository.findById(id).orElseThrow(CollegeNotFoundException::new);
     }
 
     private Point getPoint(double latitude, double longitude, double altitude) {
@@ -176,7 +129,7 @@ public class LocationServiceImpl implements LocationService {
     private List<NearByInfo> makeNearByList(Member member, List<Long> nearMemberIds) {
         List<NearByInfo> nearByList = new ArrayList<>();
         for (Long nearId : nearMemberIds) {
-            Member findMember = memberAccessor.findById(nearId);
+            Member findMember = memberChecker.findById(nearId);
             String urlCode = EMPTY_STRING;
             boolean isLiked = false;
 
@@ -204,18 +157,4 @@ public class LocationServiceImpl implements LocationService {
     private Boolean isNotBasicProfile(Member member) {
         return !member.getBasicProfile();
     }
-
-    private Polygon makePolygon(PolygonRequest request) {
-        GeometryFactory geometryFactory = new GeometryFactory();
-
-        Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(request.getTopLeftLng(), request.getTopLeftLat()),
-                new Coordinate(request.getTopRightLng(), request.getTopRightLat()),
-                new Coordinate(request.getBottomRightLng(), request.getBottomRightLat()),
-                new Coordinate(request.getBottomLeftLng(), request.getBottomLeftLat()),
-                new Coordinate(request.getTopLeftLng(), request.getTopLeftLat())
-        };
-        return geometryFactory.createPolygon(coordinates);
-    }
-
 }

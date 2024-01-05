@@ -33,18 +33,4 @@ public class SessionManager {
             member.makeSessionId(makeSessionId());
         }
     }
-
-    public Member findBySessionId(Long sessionId) {
-        return memberRepository.findBysessionId(sessionId)
-                .filter(member -> {
-                    if (member.getIsWithdrawal()) {
-                        throw new MemberNotFoundException();
-                    }
-                    if (member.getStatus() == 1 || member.getStatus() == 2) {
-                        throw new AccessForbiddenException();
-                    }
-                    return true;
-                })
-                .orElseThrow(MemberNotFoundException::new);
-    }
 }
