@@ -1,15 +1,12 @@
 package com.mjuAppSW.joA.domain.heart;
 
 import com.mjuAppSW.joA.common.auth.MemberChecker;
-import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.domain.heart.dto.HeartRequest;
 import com.mjuAppSW.joA.domain.heart.dto.HeartResponse;
 import com.mjuAppSW.joA.geography.block.exception.BlockAccessForbiddenException;
 import com.mjuAppSW.joA.domain.heart.exception.HeartAlreadyExistedException;
 import com.mjuAppSW.joA.domain.heart.exception.RoomExistedException;
 import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
 import com.mjuAppSW.joA.domain.roomInMember.RoomInMemberRepository;
 import com.mjuAppSW.joA.geography.block.BlockRepository;
 import jakarta.transaction.Transactional;

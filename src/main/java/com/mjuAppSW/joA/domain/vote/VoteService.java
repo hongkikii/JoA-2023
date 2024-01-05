@@ -1,14 +1,11 @@
 package com.mjuAppSW.joA.domain.vote;
 
 import com.mjuAppSW.joA.common.auth.MemberChecker;
-import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.geography.block.exception.BlockAccessForbiddenException;
 import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.AccessForbiddenException;
 import com.mjuAppSW.joA.domain.vote.dto.response.VoteOwnerResponse;
-import com.mjuAppSW.joA.domain.vote.dto.request.SendVoteRequest;
+import com.mjuAppSW.joA.domain.vote.dto.request.VoteRequest;
 import com.mjuAppSW.joA.domain.vote.dto.response.VoteContent;
 import com.mjuAppSW.joA.domain.vote.dto.response.VoteListResponse;
 import com.mjuAppSW.joA.domain.vote.exception.VoteAlreadyExistedException;
@@ -36,7 +33,7 @@ public class VoteService {
     private final MemberChecker memberChecker;
 
     @Transactional
-    public void sendVote(SendVoteRequest request) {
+    public void sendVote(VoteRequest request) {
         Member giveMember = memberChecker.findBySessionId(request.getGiveId());
         Member takeMember = memberChecker.findById(request.getTakeId());
         VoteCategory voteCategory = findVoteCategoryById(request.getCategoryId());

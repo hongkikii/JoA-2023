@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Schema(description = "투표 전송 Request")
 @RequiredArgsConstructor
 @NoArgsConstructor(force = true)
-public class SendVoteRequest {
+public class VoteRequest {
     @NotNull
     private final Long giveId;
     @NotNull
