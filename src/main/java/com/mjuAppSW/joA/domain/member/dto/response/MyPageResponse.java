@@ -19,6 +19,7 @@ public class MyPageResponse {
     private final String bio;
     private final Integer todayHeart;
     private final Integer totalHeart;
+    @Schema(description = "사용자가 가장 많이 받은 투표 카테고리 Top3")
     private final List<String> voteTop3;
 
     public static MyPageResponse of(Member member, Integer todayHeart, Integer totalHeart, List<String> voteTop3) {
