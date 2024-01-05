@@ -23,7 +23,7 @@ public class BlockApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "404", description = "L001: 사용자의 위치 데이터를 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "404", description = "L001: 사용자의 위치 정보를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "409", description = "B002: 이미 차단한 사용자입니다."),
     })
     @PostMapping
