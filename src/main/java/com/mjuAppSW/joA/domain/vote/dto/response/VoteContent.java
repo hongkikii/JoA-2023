@@ -8,9 +8,9 @@ import lombok.NonNull;
 @Getter
 public class VoteContent {
     @NonNull
-    private Long voteId;
+    private final Long voteId;
     @NonNull
-    private Long categoryId;
+    private final Long categoryId;
 
-    private String hint;
+    private final String hint;
 }
