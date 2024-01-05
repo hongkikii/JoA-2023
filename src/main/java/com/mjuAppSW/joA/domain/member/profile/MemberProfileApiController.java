@@ -38,7 +38,7 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @GetMapping("/setting-page/{id}")
+    @GetMapping("/{id}/setting-page")
     public ResponseEntity<SuccessResponse<SettingPageResponse>> getSettingPage(
             @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
         return SuccessResponse.of(memberProfileService.getSettingPage(sessionId))
@@ -51,7 +51,7 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @GetMapping("/my-page/{id}")
+    @GetMapping("/{id}/my-page")
     public ResponseEntity<SuccessResponse<MyPageResponse>> getMyPage(
             @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
         return SuccessResponse.of(memberProfileService.getMyPage(sessionId))
@@ -77,7 +77,7 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @DeleteMapping("/bio/{id}")
+    @PatchMapping("/{id}/bio")
     public ResponseEntity<SuccessResponse<Void>> deleteBio(
             @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
         memberProfileService.deleteBio(sessionId);
@@ -102,7 +102,7 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @DeleteMapping("/picture/{id}")
+    @PatchMapping("/{id}/picture")
     public ResponseEntity<Void> deletePicture(
             @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
         memberProfileService.deletePicture(sessionId);
