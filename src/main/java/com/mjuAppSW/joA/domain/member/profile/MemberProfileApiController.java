@@ -4,7 +4,6 @@ import com.mjuAppSW.joA.common.dto.SuccessResponse;
 import com.mjuAppSW.joA.domain.member.dto.request.BioRequest;
 import com.mjuAppSW.joA.domain.member.dto.response.MyPageResponse;
 import com.mjuAppSW.joA.domain.member.dto.request.PictureRequest;
-import com.mjuAppSW.joA.domain.member.dto.request.SessionIdRequest;
 import com.mjuAppSW.joA.domain.member.dto.response.SettingPageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,9 +38,9 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @GetMapping("/setting-page")
+    @GetMapping("/setting-page/{id}")
     public ResponseEntity<SuccessResponse<SettingPageResponse>> getSettingPage(
-            @Parameter(description = "사용자 세션 id", in = ParameterIn.QUERY) @RequestParam Long sessionId) {
+            @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
         return SuccessResponse.of(memberProfileService.getSettingPage(sessionId))
                 .asHttp(HttpStatus.OK);
     }
@@ -51,9 +51,9 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @GetMapping("/my-page")
+    @GetMapping("/my-page/{id}")
     public ResponseEntity<SuccessResponse<MyPageResponse>> getMyPage(
-            @Parameter(description = "세션 id", in = ParameterIn.QUERY) @RequestParam Long sessionId) {
+            @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
         return SuccessResponse.of(memberProfileService.getMyPage(sessionId))
                 .asHttp(HttpStatus.OK);
     }
@@ -77,9 +77,10 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @DeleteMapping("/bio")
-    public ResponseEntity<SuccessResponse<Void>> deleteBio(@RequestBody @Valid SessionIdRequest request) {
-        memberProfileService.deleteBio(request);
+    @DeleteMapping("/bio/{id}")
+    public ResponseEntity<SuccessResponse<Void>> deleteBio(
+            @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
+        memberProfileService.deleteBio(sessionId);
         return ResponseEntity.ok().build();
     }
 
@@ -101,9 +102,10 @@ public class MemberProfileApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
     })
-    @DeleteMapping("/picture")
-    public ResponseEntity<Void> deletePicture(@RequestBody @Valid SessionIdRequest request) {
-        memberProfileService.deletePicture(request);
+    @DeleteMapping("/picture/{id}")
+    public ResponseEntity<Void> deletePicture(
+            @Parameter(description = "사용자 세션 id", in = ParameterIn.PATH) @PathVariable("id") Long sessionId) {
+        memberProfileService.deletePicture(sessionId);
         return ResponseEntity.ok().build();
     }
 }

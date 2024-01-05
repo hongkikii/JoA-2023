@@ -42,9 +42,6 @@ public class Member {
     @Column(name = "Url_code")
     private String urlCode;
 
-    @Column(name = "Basic_profile")
-    private Boolean basicProfile;
-
     private Boolean isWithdrawal;
 
     @Column(name = "Session_id")
@@ -72,7 +69,6 @@ public class Member {
         this.salt = salt;
         this.uEmail = uEmail;
         this.college = college;
-        this.basicProfile = true;
         this.isWithdrawal = false;
         this.bio = "";
         this.urlCode = "";
@@ -95,10 +91,6 @@ public class Member {
 
     public void changePassword(String password) {
         this.password = password;
-    }
-
-    public void changeBasicProfile(boolean basicProfile) {
-        this.basicProfile = basicProfile;
     }
 
     public void changeWithdrawal(boolean withdrawal) {
