@@ -142,11 +142,11 @@ public class InitDevMysql {
         }
 
         public void initHeart() {
-            heart1 = new Heart(2L, member1, LocalDate.of(2023, 7, 25), false);
-            heart2 = new Heart(2L, member1, LocalDate.now(), false);
-            heart3 = new Heart(3L, member1, LocalDate.now(), false);
-            heart4 = new Heart(4L, member1, LocalDate.now(), false);
-            heart5 = new Heart(5L, member1, LocalDate.of(2023, 7, 25), false);
+            heart1 = new Heart(2L, member1, LocalDate.of(2023, 7, 25));
+            heart2 = new Heart(2L, member1, LocalDate.now());
+            heart3 = new Heart(3L, member1, LocalDate.now());
+            heart4 = new Heart(4L, member1, LocalDate.now());
+            heart5 = new Heart(5L, member1, LocalDate.of(2023, 7, 25));
 
             em.persist(heart1);
             em.persist(heart2);

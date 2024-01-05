@@ -32,16 +32,12 @@ public class Heart {
     private Member member;
 
     @Column(nullable = false)
-    private LocalDate date; // LocalDateTime으로 수정해야, 변환 조회 방법 모르겠어서 일단 이렇게
-
-    @Column(nullable = false)
-    private Boolean named;
+    private LocalDate date;
 
     @Builder
-    public Heart(Long giveId, Member member, LocalDate date, Boolean named) {
+    public Heart(Long giveId, Member member, LocalDate date) {
         this.giveId = giveId;
         this.member = member;
         this.date = date;
-        this.named = named;
     }
 }
