@@ -84,6 +84,28 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi collegeOpenApi() {
+        String[] paths = {"/joa/colleges/**"};
+
+        return GroupedOpenApi
+                .builder()
+                .group("학교 API")
+                .pathsToMatch(paths)
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi blockOpenApi() {
+        String[] paths = {"/joa/blocks/**"};
+
+        return GroupedOpenApi
+                .builder()
+                .group("차단 API")
+                .pathsToMatch(paths)
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi voteReportOpenApi() {
         String[] paths = {"/joa/reports/**"};
 
