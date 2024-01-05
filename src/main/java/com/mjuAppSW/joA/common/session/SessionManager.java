@@ -2,8 +2,6 @@ package com.mjuAppSW.joA.common.session;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

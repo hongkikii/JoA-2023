@@ -1,10 +1,10 @@
-package com.mjuAppSW.joA.domain.member.profile;
+package com.mjuAppSW.joA.domain.memberProfile;
 
 import com.mjuAppSW.joA.common.dto.SuccessResponse;
-import com.mjuAppSW.joA.domain.member.dto.request.BioRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.MyPageResponse;
-import com.mjuAppSW.joA.domain.member.dto.request.PictureRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.SettingPageResponse;
+import com.mjuAppSW.joA.domain.memberProfile.dto.request.BioRequest;
+import com.mjuAppSW.joA.domain.memberProfile.dto.response.MyPageResponse;
+import com.mjuAppSW.joA.domain.memberProfile.dto.request.PictureRequest;
+import com.mjuAppSW.joA.domain.memberProfile.dto.response.SettingPageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,13 +15,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

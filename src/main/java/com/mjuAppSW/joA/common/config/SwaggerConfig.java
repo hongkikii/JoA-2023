@@ -30,11 +30,11 @@ public class SwaggerConfig {
 
     @Bean
     public GroupedOpenApi authOpenApi() {
-        String[] paths = {"/joa/auths/**"};
+        String[] paths = {"/joa/members/**"};
 
         return GroupedOpenApi
                 .builder()
-                .group("사용자 인증 API")
+                .group("사용자 관리 API")
                 .pathsToMatch(paths)
                 .build();
     }
