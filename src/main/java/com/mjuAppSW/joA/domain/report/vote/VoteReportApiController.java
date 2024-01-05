@@ -1,7 +1,6 @@
 package com.mjuAppSW.joA.domain.report.vote;
 
 import com.mjuAppSW.joA.domain.report.vote.dto.VoteReportRequest;
-import com.mjuAppSW.joA.domain.vote.dto.response.StatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/joa/reports")
-public class VoteReportController {
+public class VoteReportApiController {
 
     private final VoteReportService voteReportService;
 
@@ -31,7 +30,7 @@ public class VoteReportController {
             @ApiResponse(responseCode = "409", description = "VR001: 이미 투표 신고가 존재합니다."),
     })
     @PostMapping("/vote")
-    public ResponseEntity<StatusResponse> reportVote(@RequestBody @Valid VoteReportRequest request) {
+    public ResponseEntity<Void> reportVote(@RequestBody @Valid VoteReportRequest request) {
         voteReportService.reportVote(request);
         return ResponseEntity.ok().build();
     }
