@@ -1,7 +1,7 @@
 package com.mjuAppSW.joA.domain.vote;
 
 import com.mjuAppSW.joA.common.session.SessionManager;
-import com.mjuAppSW.joA.domain.heart.exception.BlockExistedException;
+import com.mjuAppSW.joA.geography.block.exception.BlockAccessForbiddenException;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
@@ -78,7 +78,7 @@ public class VoteService {
 
     private void checkBlock(Long giveId, Long takeId) {
         if (!blockRepository.findBlockByIds(giveId, takeId).isEmpty()) {
-            throw new BlockExistedException();
+            throw new BlockAccessForbiddenException();
         }
     }
 
