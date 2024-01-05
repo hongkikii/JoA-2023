@@ -13,9 +13,9 @@ public class ErrorResponse {
 
     @Schema(description = "성공 여부. 항상 false 이다.", defaultValue = "false")
     private final boolean status = false;
-    private final String message;
+    private final String code;
 
     public static ErrorResponse of(ErrorCode errorCode) {
-        return new ErrorResponse(errorCode.getMessage());
+        return new ErrorResponse(errorCode.getCode());
     }
 }
