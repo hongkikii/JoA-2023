@@ -24,19 +24,15 @@ public class VoteReportController {
 
     @Operation(summary = "투표 신고", description = "투표 신고 API")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "투표 신고 확인 코드 응답"),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Z001: id에 해당하는 사용자를 찾을 수 없습니다.")
+            @ApiResponse(responseCode = "200", description = "상태 코드 응답"),
+            @ApiResponse(responseCode = "404", description = "RC001: 신고 카테고리가 존재하지 않습니다."),
+            @ApiResponse(responseCode = "404", description = "V001: 투표가 존재하지 않습니다."),
+            @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "409", description = "VR001: 이미 투표 신고가 존재합니다."),
     })
     @PostMapping("/vote")
     public ResponseEntity<StatusResponse> reportVote(@RequestBody @Valid VoteReportRequest request) {
-        log.info("reportVote : voteId = {}, reportId = {}, content = {}",
-                request.getVoteId(), request.getReportId(), request.getContent());
-        StatusResponse response = voteReportService.reportVote(request);
-        log.info("reportVote Return : OK, status = {}", response.getStatus());
-        return ResponseEntity.ok(response);
+        voteReportService.reportVote(request);
+        return ResponseEntity.ok().build();
     }
 }

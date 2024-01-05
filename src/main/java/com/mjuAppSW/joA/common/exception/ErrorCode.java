@@ -18,6 +18,15 @@ public enum ErrorCode {
     // Heart
     HEART_ALREADY_EXISTED(409, "H001", "이미 하트가 존재합니다."),
 
+    // Vote
+    VOTE_NOT_FOUND(404, "V001", "투표가 존재하지 않습니다."),
+
+    // Vote Report
+    VOTE_REPORT_ALREADY_EXISTED(409, "VR001", "이미 투표 신고가 존재합니다."),
+
+    // Report Category
+    REPORT_CATEGORY_NOT_FOUND(404, "RC001", "신고 카테고리가 존재하지 않습니다."),
+
     // Block
     BLOCK_EXISTED(403, "B001", "차단 조치가 이루어진 계정입니다."),
 
