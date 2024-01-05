@@ -5,11 +5,9 @@ import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
 import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.common.auth.MemberChecker;
-import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.domain.heart.Heart;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
 import com.mjuAppSW.joA.geography.block.exception.LocationNotFoundException;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
@@ -18,12 +16,13 @@ import com.mjuAppSW.joA.geography.location.dto.response.NearByListResponse;
 import com.mjuAppSW.joA.geography.location.dto.response.OwnerResponse;
 import com.mjuAppSW.joA.geography.location.dto.request.UpdateRequest;
 import com.mjuAppSW.joA.geography.location.dto.response.UpdateResponse;
-import com.mjuAppSW.joA.geography.location.exception.AccessStoppedException;
 import com.mjuAppSW.joA.geography.location.exception.CollegeNotFoundException;
+import com.mjuAppSW.joA.geography.location.exception.OutOfCollegeException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -57,43 +56,26 @@ public class LocationService {
         Point point = getPoint(request.getLatitude(), request.getLongitude(), request.getAltitude());
         Location newLocation = new Location(location.getId(), location.getCollege(), point, isContained, LocalDate.now());
         locationRepository.save(newLocation);
-        return new UpdateResponse(NORMAL_OPERATION, isContained);
+        return UpdateResponse.of(isContained);
     }
 
-    public NearByListResponse getNearByList(UpdateRequest request) {
-        Member member = memberChecker.findBySessionId(request.getId());
-        if(isNull(member))
-            return new NearByListResponse(GeographyList.MEMBER_IS_INVALID);
-
-        if (memberChecker.checkStopped(member.getSessionId());)
-            return new NearByListResponse(GeographyList.MEMBER_IS_STOPPED);
+    public NearByListResponse getNearByList(Long sessionId, Double latitude, Double longitude, Double altitude) {
+        Member member = memberChecker.findBySessionId(sessionId);
+        memberChecker.checkStopped(member);
 
         Location location = findLocationById(member.getId());
-        if(isNull(location))
-            return new NearByListResponse(GeographyList.MEMBER_GEOGRAPHY_IS_INVALID);
 
-        if(isNotWithinCollege(location))
-            return new NearByListResponse(GeographyList.MEMBER_IS_OUT_OF_COLLEGE);
+        checkWithinCollege(location);
 
-        Point point = getPoint(request.getLatitude(), request.getLongitude(), request.getAltitude());
+        Point point = getPoint(latitude, longitude, altitude);
         List<Long> nearMemberIds = findNearIds(member.getId(), point, member.getCollege().getId());
         List<NearByInfo> nearByList = makeNearByList(member, nearMemberIds);
-        return new NearByListResponse(NORMAL_OPERATION, nearByList);
+        return NearByListResponse.of(nearByList);
     }
 
     public OwnerResponse getOwner(Long sessionId) {
         Member findMember = memberChecker.findBySessionId(sessionId);
-        if(isNull(findMember))
-            return OwnerResponse.builder()
-                                .status(GeographyInfo.MEMBER_IS_INVALID)
-                                .build();
-
-        return OwnerResponse.builder()
-                            .status(NORMAL_OPERATION)
-                            .name(findMember.getName())
-                            .urlCode(findMember.getUrlCode())
-                            .bio(findMember.getBio())
-                            .build();
+        return OwnerResponse.of(findMember);
     }
 
     private Location findLocationById(Long id) {
@@ -118,8 +100,10 @@ public class LocationService {
         return polygon.contains(point);
     }
 
-    private Boolean isNotWithinCollege(Location location) {
-        return !location.getIsContained();
+    private void checkWithinCollege(Location location) {
+        if (!location.getIsContained()) {
+            throw new OutOfCollegeException();
+        }
     }
 
     private List<Long> findNearIds(Long id, Point point, Long collegeId) {
@@ -127,34 +111,24 @@ public class LocationService {
     }
 
     private List<NearByInfo> makeNearByList(Member member, List<Long> nearMemberIds) {
-        List<NearByInfo> nearByList = new ArrayList<>();
-        for (Long nearId : nearMemberIds) {
-            Member findMember = memberChecker.findById(nearId);
-            String urlCode = EMPTY_STRING;
-            boolean isLiked = false;
+        List<NearByInfo> nearByList = nearMemberIds.stream()
+                .map(nearId -> {
+                    Member findMember = memberChecker.findById(nearId);
+                    boolean isLiked = isEqualHeartExisted(member.getId(), nearId);
+                    return NearByInfo.builder()
+                            .id(findMember.getId())
+                            .name(findMember.getName())
+                            .urlCode(findMember.getUrlCode())
+                            .bio(findMember.getBio())
+                            .isLiked(isLiked)
+                            .build();
+                })
+                .collect(Collectors.toList());
 
-            if(isNotBasicProfile(findMember))
-                urlCode = findMember.getUrlCode();
-            if(isEqualHeartExisted(member.getId(), nearId))
-                isLiked = true;
-
-            nearByList.add(NearByInfo.builder()
-                    .id(findMember.getId())
-                    .name(findMember.getName())
-                    .urlCode(urlCode)
-                    .bio(findMember.getBio())
-                    .isLiked(isLiked)
-                    .build());
-        }
         return nearByList;
     }
 
     private Boolean isEqualHeartExisted(Long giveId, Long takeId) {
-        Heart equalHeart = heartRepository.findEqualHeart(LocalDate.now(), giveId, takeId).orElse(null);
-        return !isNull(equalHeart);
-    }
-
-    private Boolean isNotBasicProfile(Member member) {
-        return !member.getBasicProfile();
+        return heartRepository.findEqualHeart(LocalDate.now(), giveId, takeId).isPresent();
     }
 }
