@@ -1,6 +1,6 @@
 package com.mjuAppSW.joA.geography.college;
 
-import com.mjuAppSW.joA.geography.location.dto.request.PolygonRequest;
+import com.mjuAppSW.joA.geography.college.dto.PolygonRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

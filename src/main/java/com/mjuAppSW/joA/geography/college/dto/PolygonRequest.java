@@ -1,11 +1,11 @@
-package com.mjuAppSW.joA.geography.location.dto.request;
+package com.mjuAppSW.joA.geography.college.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-@Schema(description = "학교 범위 설정 Request")
+@Schema(description = "학교 범위 등록 Request")
 public class PolygonRequest {
     @NotNull
     private Long collegeId;
