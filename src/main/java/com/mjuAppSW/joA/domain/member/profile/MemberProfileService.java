@@ -68,7 +68,7 @@ public class MemberProfileService {
     @Transactional
     public void deleteBio(SessionIdRequest request) {
         Member member = sessionManager.findBySessionId(request.getId());
-        member.changeBio("");
+        member.changeBio(EMPTY_STRING);
     }
 
     @Transactional
