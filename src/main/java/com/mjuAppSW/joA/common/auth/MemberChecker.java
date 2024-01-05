@@ -2,8 +2,9 @@ package com.mjuAppSW.joA.common.auth;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.AccessForbiddenException;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
+import com.mjuAppSW.joA.domain.member.exception.LoginIdNotAuthException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.AccessForbiddenException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.MemberNotFoundException;
 import com.mjuAppSW.joA.geography.location.exception.AccessStoppedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,9 +33,18 @@ public class MemberChecker {
                 .orElseThrow(MemberNotFoundException::new);
     }
 
+    public Member findByLoginId(String loginId) {
+        return memberRepository.findByloginId(loginId)
+                .orElseThrow(LoginIdNotAuthException::new);
+    }
+
     public void checkStopped(Member member) {
         if (member.getStatus() == 1 || member.getStatus() == 2) {
             throw new AccessStoppedException();
         }
+    }
+
+    public boolean isStopped(Member member) {
+        return member.getStatus() == 1 || member.getStatus() == 2;
     }
 }

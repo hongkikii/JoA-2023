@@ -10,11 +10,11 @@ import lombok.RequiredArgsConstructor;
 @Schema(description = "인증번호 전송 Response")
 @Builder(access = AccessLevel.PRIVATE)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SendCertifyNumResponse {
+public class SessionIdResponse {
     private final Long id;
 
-    public static SendCertifyNumResponse of(Long id) {
-        return SendCertifyNumResponse.builder()
+    public static SessionIdResponse of(Long id) {
+        return SessionIdResponse.builder()
                                         .id(id)
                                         .build();
     }

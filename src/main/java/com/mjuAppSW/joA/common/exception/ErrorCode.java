@@ -23,8 +23,19 @@ public enum ErrorCode {
     // Member
     MEMBER_NOT_FOUND(404,"M001","사용자를 찾을 수 없습니다."),
     ACCESS_FORBIDDEN(403, "M002", "접근 권한이 없는 계정입니다."),
-    S3_INVALID(500, "M003", "이미지 업로드에 실패하였습니다."),
+    S3_INVALID(500, "M003", "S3 저장소 접근에 실패했습니다."),
     ACCESS_STOPPED(403, "M004", "정지된 계정입니다."),
+    MEMBER_ALREADY_EXISTED(409, "M005", "이미 존재하는 사용자입니다."),
+    JOINING_MAIL(409, "M006", "사용 중인 이메일입니다."),
+    SESSION_NOT_FOUND(404, "M007", "세션 id가 유효하지 않습니다."),
+    MAIL_NOT_CACHED(400, "M008", "이메일 인증이 완료되지 않았습니다"),
+    INVALID_CERTIFY_NUMBER(400, "M009", "인증번호가 올바르지 않습니다."),
+    INVALID_LOGIN_ID(400, "M010", "올바른 아이디 형식이 아닙니다."),
+    LOGIN_ID_ALREADY_EXISTED(409, "M011", "이미 사용 중인 아이디입니다."),
+    INVALID_PASSWORD(400, "M012", "올바른 비밀번호 형식이 아닙니다."),
+    LOGIN_ID_NOT_AUTH(404, "M013", "아이디 중복 확인이 완료되지 않았습니다."),
+    MAIL_FORBIDDEN(403, "M014", "접근이 제한된 이메일입니다."),
+    PASSWORD_NOT_FOUND(404, "M015", "비밀번호가 올바르지 않습니다."),
 
     // PCollege
     COLLEGE_NOT_FOUND(404,"P001" , "학교 정보를 찾을 수 없습니다."),

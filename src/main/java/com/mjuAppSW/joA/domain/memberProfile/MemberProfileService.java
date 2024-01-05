@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.member.profile;
+package com.mjuAppSW.joA.domain.memberProfile;
 
 import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
 import static com.mjuAppSW.joA.common.constant.Constants.S3Uploader.ERROR;
@@ -6,13 +6,12 @@ import static com.mjuAppSW.joA.common.constant.Constants.S3Uploader.ERROR;
 import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.dto.request.BioRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.MyPageResponse;
-import com.mjuAppSW.joA.domain.member.dto.request.PictureRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.SettingPageResponse;
-import com.mjuAppSW.joA.domain.member.exception.S3InvalidException;
+import com.mjuAppSW.joA.domain.memberProfile.dto.request.BioRequest;
+import com.mjuAppSW.joA.domain.memberProfile.dto.response.MyPageResponse;
+import com.mjuAppSW.joA.domain.memberProfile.dto.request.PictureRequest;
+import com.mjuAppSW.joA.domain.memberProfile.dto.response.SettingPageResponse;
+import com.mjuAppSW.joA.domain.memberProfile.exception.S3InvalidException;
 import com.mjuAppSW.joA.domain.vote.VoteRepository;
-import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.common.storage.S3Uploader;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;

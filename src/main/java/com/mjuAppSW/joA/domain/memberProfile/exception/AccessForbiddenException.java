@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.member.exception;
+package com.mjuAppSW.joA.domain.memberProfile.exception;
 
 import com.mjuAppSW.joA.common.exception.BusinessException;
 import com.mjuAppSW.joA.common.exception.ErrorCode;

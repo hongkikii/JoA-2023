@@ -1,4 +1,4 @@
-package com.mjuAppSW.joA.domain.member.dto.request;
+package com.mjuAppSW.joA.domain.memberProfile.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

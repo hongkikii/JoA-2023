@@ -1,12 +1,5 @@
-package com.mjuAppSW.joA.domain.member.auth;
+package com.mjuAppSW.joA.domain.member;
 
-import static com.mjuAppSW.joA.common.constant.Constants.Auth;
-import static com.mjuAppSW.joA.common.constant.Constants.Auth.CERTIFY_NUMBER_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.Auth.LOGIN_ID_IS_CACHED;
-import static com.mjuAppSW.joA.common.constant.Constants.Auth.LOGIN_ID_IS_EXISTED;
-import static com.mjuAppSW.joA.common.constant.Constants.Auth.LOGIN_ID_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.Auth.MAIL_IS_NOT_CACHED;
-import static com.mjuAppSW.joA.common.constant.Constants.Auth.SESSION_ID_IS_NOT_EXISTED;
 import static com.mjuAppSW.joA.common.constant.Constants.Cache.AFTER_CERTIFY_TIME;
 import static com.mjuAppSW.joA.common.constant.Constants.Cache.AFTER_EMAIL;
 import static com.mjuAppSW.joA.common.constant.Constants.Cache.AFTER_SAVE_LOGIN_ID_TIME;
@@ -16,40 +9,35 @@ import static com.mjuAppSW.joA.common.constant.Constants.Cache.CERTIFY_NUMBER;
 import static com.mjuAppSW.joA.common.constant.Constants.Cache.ID;
 import static com.mjuAppSW.joA.common.constant.Constants.EMAIL_SPLIT;
 import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.common.constant.Constants.FindId;
-import static com.mjuAppSW.joA.common.constant.Constants.Join;
-import static com.mjuAppSW.joA.common.constant.Constants.Login.LOGIN_ID_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.common.constant.Constants.Login.PASSWORD_IS_NOT_EXISTED;
-import static com.mjuAppSW.joA.common.constant.Constants.Logout.MEMBER_IS_NOT_EXISTED;
 import static com.mjuAppSW.joA.common.constant.Constants.MAIL.CERTIFY_NUMBER_IS;
 import static com.mjuAppSW.joA.common.constant.Constants.MAIL.TEMPORARY_PASSWORD_IS;
 import static com.mjuAppSW.joA.common.constant.Constants.MAIL.USER_ID_IS;
-import static com.mjuAppSW.joA.common.constant.Constants.Member.COLLEGE_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.Member.MAIL_IS_USING;
-import static com.mjuAppSW.joA.common.constant.Constants.Member.MEMBER_IS_EXISTED;
-import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
-import static com.mjuAppSW.joA.common.constant.Constants.S3Uploader.S3_DELETE_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.TransPassword;
-import static com.mjuAppSW.joA.common.constant.Constants.TransPassword.PASSWORD_IS_INVALID;
-import static com.mjuAppSW.joA.common.constant.Constants.TransPassword.PASSWORD_IS_NOT_EQUAL;
-import static com.mjuAppSW.joA.common.constant.Constants.Withdrawal;
 import static java.util.Objects.isNull;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.domain.college.MCollege;
 import com.mjuAppSW.joA.domain.college.MCollegeRepository;
-import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.member.dto.request.FindIdRequest;
 import com.mjuAppSW.joA.domain.member.dto.request.FindPasswordRequest;
 import com.mjuAppSW.joA.domain.member.dto.request.JoinRequest;
 import com.mjuAppSW.joA.domain.member.dto.request.LoginRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.LoginResponse;
-import com.mjuAppSW.joA.domain.member.dto.request.SessionIdRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.StatusResponse;
 import com.mjuAppSW.joA.domain.member.dto.request.TransPasswordRequest;
 import com.mjuAppSW.joA.domain.member.dto.request.SendCertifyNumRequest;
-import com.mjuAppSW.joA.domain.member.dto.response.SendCertifyNumResponse;
+import com.mjuAppSW.joA.domain.member.dto.response.SessionIdResponse;
 import com.mjuAppSW.joA.domain.member.dto.request.VerifyCertifyNumRequest;
+import com.mjuAppSW.joA.domain.member.exception.InvalidCertifyNumberException;
+import com.mjuAppSW.joA.domain.member.exception.InvalidLoginIdException;
+import com.mjuAppSW.joA.domain.member.exception.InvalidPasswordException;
+import com.mjuAppSW.joA.domain.member.exception.JoiningMailException;
+import com.mjuAppSW.joA.domain.member.exception.LoginIdAlreadyExistedException;
+import com.mjuAppSW.joA.domain.member.exception.LoginIdNotAuthException;
+import com.mjuAppSW.joA.domain.member.exception.MailForbiddenException;
+import com.mjuAppSW.joA.domain.member.exception.MailNotCachedException;
+import com.mjuAppSW.joA.domain.member.exception.MemberAlreadyExistedException;
+import com.mjuAppSW.joA.domain.member.exception.PasswordNotFoundException;
+import com.mjuAppSW.joA.domain.member.exception.SessionNotFoundException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.MemberNotFoundException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.S3InvalidException;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
 import com.mjuAppSW.joA.geography.location.Location;
@@ -57,6 +45,7 @@ import com.mjuAppSW.joA.geography.location.LocationRepository;
 import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.common.storage.CacheManager;
 import com.mjuAppSW.joA.common.storage.S3Uploader;
+import com.mjuAppSW.joA.geography.location.exception.CollegeNotFoundException;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
 import java.util.Optional;
@@ -73,7 +62,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthService {
+public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MCollegeRepository mCollegeRepository;
@@ -83,90 +72,67 @@ public class AuthService {
     private final JavaMailSender javaMailSender;
     private final CacheManager cacheManager;
     private final S3Uploader s3Uploader;
+    private final MemberChecker memberChecker;
 
-    public SendCertifyNumResponse sendCertifyNum(SendCertifyNumRequest request) {
+    public SessionIdResponse sendCertifyNum(SendCertifyNumRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
-        if (isNull(college)) {
-            return new SendCertifyNumResponse(COLLEGE_IS_INVALID);
-        }
-
-        if (isExistedMember(request.getUEmail(), college)) {
-            return new SendCertifyNumResponse(MEMBER_IS_EXISTED);
-        }
+        checkExistedMember(request.getUEmail(), college);
 
         String eMail = request.getUEmail() + college.getDomain();
-        if (isUsingMail(eMail)) {
-            return new SendCertifyNumResponse(MAIL_IS_USING);
-        }
+        checkJoiningMail(eMail);
 
         long sessionId = sessionManager.makeSessionId();
         String certifyNum = cacheCertifyNumAndEmail(sessionId, eMail);
         sendCertifyNumMail(request.getUEmail(), college.getDomain(), certifyNum);
-        return new SendCertifyNumResponse(NORMAL_OPERATION, sessionId);
+        return SessionIdResponse.of(sessionId);
     }
 
-    public StatusResponse verifyCertifyNum(VerifyCertifyNumRequest request) {
+    public void verifyCertifyNum(VerifyCertifyNumRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
-        if (isNull(college)) {
-            return new StatusResponse(Auth.COLLEGE_IS_NOT_EXISTED);
-        }
-
         Long sessionId = request.getId();
-        if (isNotExistedCacheKey(CERTIFY_NUMBER + sessionId)) {
-            return new StatusResponse(SESSION_ID_IS_NOT_EXISTED);
-        }
-
         String mail = request.getUEmail() + college.getDomain();
+
+        if(cacheManager.isNotExistedKey(CERTIFY_NUMBER + sessionId)) {
+            throw new SessionNotFoundException();
+        }
         if (!isEqualCacheValue(BEFORE_EMAIL + sessionId, mail)) {
-            return new StatusResponse(MAIL_IS_NOT_CACHED);
+            throw new MailNotCachedException();
         }
-
-        if (isEqualCacheValue(CERTIFY_NUMBER + sessionId, request.getCertifyNum())) {
-            cacheEmailOnly(sessionId);
-            return new StatusResponse(NORMAL_OPERATION);
+        if (!isEqualCacheValue(CERTIFY_NUMBER + sessionId, request.getCertifyNum())) {
+            throw new InvalidCertifyNumberException();
         }
-
-        return new StatusResponse(CERTIFY_NUMBER_IS_INVALID);
+        cacheEmailOnly(sessionId);
     }
 
-    public StatusResponse verifyId(Long sessionId, String loginId) {
+    public void verifyId(Long sessionId, String loginId) {
         if (isNotValidLoginId(loginId)) {
-            return new StatusResponse(LOGIN_ID_IS_INVALID);
+            throw new InvalidLoginIdException();
         }
-
         if (isNotExistedCacheKey(AFTER_EMAIL + sessionId)) {
-            return new StatusResponse(SESSION_ID_IS_NOT_EXISTED);
+            throw new SessionNotFoundException();
         }
+        checkExistedLoginId(loginId);
 
-        if (!isNull(findByLoginId(loginId))) {
-            return new StatusResponse(LOGIN_ID_IS_EXISTED);
+        if (isCachedLoginId(loginId) && !isMyJoiningId(sessionId, loginId)) {
+            throw new LoginIdAlreadyExistedException();
         }
-
-        if (isCachedLoginId(loginId)) {
-            if (isMyJoiningId(sessionId, loginId)) {
-                return new StatusResponse(NORMAL_OPERATION);
-            }
-            return new StatusResponse(LOGIN_ID_IS_CACHED);
-        }
-
         cacheLoginId(sessionId, loginId);
-        return new StatusResponse(NORMAL_OPERATION);
     }
 
     @Transactional
-    public StatusResponse join(JoinRequest request) {
+    public void join(JoinRequest request) {
         if (isNotValidPassword(request.getPassword())) {
-            return new StatusResponse(Join.PASSWORD_IS_INVALID);
+            throw new InvalidPasswordException();
         }
 
         Long sessionId = request.getId();
         if (isNotExistedCacheKey(AFTER_EMAIL + sessionId)) {
-            return new StatusResponse(Join.SESSION_ID_IS_NOT_EXISTED);
+            throw new SessionNotFoundException();
         }
 
         String loginId = request.getLoginId();
         if (isNotCachedLoginId(sessionId, request.getLoginId())) {
-            return new StatusResponse(Join.LOGIN_ID_IS_NOT_CACHED);
+            throw new LoginIdNotAuthException();
         }
 
         String eMail = cacheManager.getData(AFTER_EMAIL + sessionId);
@@ -175,12 +141,9 @@ public class AuthService {
         MCollege mCollege = findByDomain(splitEMail[1]);
 
         PCollege pCollege = findByPCollegeId(mCollege.getId());
-        if (isNull(pCollege)) {
-            return new StatusResponse(Join.COLLEGE_IS_INVALID);
-        }
 
         if (isForbiddenMail(uEmail, mCollege)) {
-            return new StatusResponse(Join.MAIL_IS_FORBIDDEN);
+            throw new MailForbiddenException();
         }
 
         // 비밀번호 암호화
@@ -201,35 +164,26 @@ public class AuthService {
         Location joinLocation = new Location(joinMember.getId(), pCollege);
         locationRepository.save(joinLocation);
         emptyCache(sessionId);
-        return new StatusResponse(NORMAL_OPERATION);
     }
 
     @Transactional
-    public LoginResponse login(LoginRequest request) {
-        Member findMember = findByLoginId(request.getLoginId());
-        if (isNull(findMember)) {
-            return new LoginResponse(LOGIN_ID_IS_NOT_EXISTED);
-        }
-
+    public SessionIdResponse login(LoginRequest request) {
+        Member findMember = memberChecker.findByLoginId(request.getLoginId());
         findMember.makeSessionId(sessionManager.makeSessionId());
+
         // 비밀번호 암호화
         String salt = findMember.getSalt();
         String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
 
-        if (findMember.getPassword().equals(hashedPassword)) {
-            return new LoginResponse(NORMAL_OPERATION, findMember.getSessionId());
+        if (!findMember.getPassword().equals(hashedPassword)) {
+            throw new PasswordNotFoundException();
         }
-
-        return new LoginResponse(PASSWORD_IS_NOT_EXISTED);
+        return SessionIdResponse.of(findMember.getSessionId());
     }
 
     @Transactional
-    public StatusResponse logout(SessionIdRequest request) {
-        Member findMember = sessionManager.findBySessionId(request.getId());
-        if (isNull(findMember)) {
-            return new StatusResponse(MEMBER_IS_NOT_EXISTED);
-        }
-
+    public void logout(Long sessionId) {
+        Member findMember = memberChecker.findBySessionId(sessionId);
         Location location = locationRepository.findById(findMember.getId()).orElse(null);
         if (!isNull(location)) {
             Location newLocation = new Location(location.getId(), location.getCollege(),
@@ -237,100 +191,82 @@ public class AuthService {
             locationRepository.save(newLocation);
         }
         findMember.expireSessionId();
-        return new StatusResponse(NORMAL_OPERATION);
     }
 
     @Transactional
-    public StatusResponse findId(FindIdRequest request) {
+    public void findId(FindIdRequest request) {
         MCollege college = findByMCollegeId(request.getCollegeId());
-        if (isNull(college)) {
-            return new StatusResponse(FindId.COLLEGE_IS_NOT_EXISTED);
-        }
 
         Member member = findByUEmailAndCollege(request.getUEmail(), college);
         if (isNull(member)) {
-            return new StatusResponse(FindId.MEMBER_IS_NOT_EXISTED);
+            throw new MemberNotFoundException();
         }
 
         mail(USER_ID_IS, member.getName(), member.getUEmail(), college.getDomain(), member.getLoginId());
-        return new StatusResponse(NORMAL_OPERATION);
     }
 
     @Transactional
-    public StatusResponse findPassword(FindPasswordRequest request) {
-        Member member = findByLoginId(request.getLoginId());
-        if (isNull(member)) {
-            return new StatusResponse(MEMBER_IS_NOT_EXISTED);
-        }
+    public void findPassword(FindPasswordRequest request) {
+        Member member = memberChecker.findByLoginId(request.getLoginId());
 
         // 비밀번호 암호화
         String randomPassword = randomPassword();
         String hashedRandomPassword = BCrypt.hashpw(randomPassword, member.getSalt());
+
         mail(TEMPORARY_PASSWORD_IS, member.getName(), member.getUEmail(),
                 member.getCollege().getDomain(), randomPassword);
         member.changePassword(hashedRandomPassword);
-        return new StatusResponse(NORMAL_OPERATION);
     }
 
     @Transactional
-    public StatusResponse transPassword(TransPasswordRequest request) {
-        Member findMember = sessionManager.findBySessionId(request.getId());
-        if (isNull(findMember)) {
-            return new StatusResponse(TransPassword.MEMBER_IS_NOT_EXISTED);
-        }
+    public void transPassword(TransPasswordRequest request) {
+        Member findMember = memberChecker.findBySessionId(request.getId());
 
         // 비밀번호 암호화
         String hashedCurrentPassword = BCrypt.hashpw(request.getCurrentPassword(), findMember.getSalt());
         if (findMember.getPassword().equals(hashedCurrentPassword)) {
             if (isNotValidPassword(request.getNewPassword())) {
-                return new StatusResponse(PASSWORD_IS_INVALID);
+                throw new InvalidPasswordException();
             }
 
             // 비밀번호 암호화
             String hashedNewPassword = BCrypt.hashpw(request.getNewPassword(), findMember.getSalt());
             findMember.changePassword(hashedNewPassword);
-            return new StatusResponse(NORMAL_OPERATION);
+            return;
         }
-        return new StatusResponse(PASSWORD_IS_NOT_EQUAL);
+        throw new PasswordNotFoundException();
     }
 
     @Transactional
-    public StatusResponse withdrawal(SessionIdRequest request) {
-        Long sessionId = request.getId();
-        Member member = sessionManager.findBySessionId(sessionId);
-        if (isNull(member)) {
-            return new StatusResponse(Withdrawal.MEMBER_IS_NOT_EXISTED);
-        }
+    public void withdrawal(Long sessionId) {
+        Member member = memberChecker.findBySessionId(sessionId);
 
         if (s3Uploader.deletePicture(member.getUrlCode())) {
             locationRepository.deleteById(member.getId());
             member.expireSessionId();
             member.changeWithdrawal(true);
-            member.changeBasicProfile(true);
             member.changeUrlCode(EMPTY_STRING);
-            return new StatusResponse(NORMAL_OPERATION);
+            return;
         }
-        return new StatusResponse(S3_DELETE_IS_INVALID);
+        throw new S3InvalidException();
     }
 
     private MCollege findByMCollegeId(Long collegeId) {
-        return mCollegeRepository.findById(collegeId).orElse(null);
+        return mCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
     }
 
-    private Boolean isExistedMember(String uEmail, MCollege college) {
-        if (isNull(findByUEmailAndCollege(uEmail, college))) {
-            return false;
+    private void checkExistedMember(String uEmail, MCollege college) {
+        if (!isNull(findByUEmailAndCollege(uEmail, college))) {
+            throw new MemberAlreadyExistedException();
         }
-        return true;
     }
 
-    private Boolean isUsingMail(String eMail) {
+    private void checkJoiningMail(String eMail) {
         boolean isCertifyingMail = isExistedInCache(BEFORE_EMAIL, eMail);
         boolean isJoiningMail = isExistedInCache(AFTER_EMAIL, eMail);
         if (isJoiningMail || isCertifyingMail) {
-            return true;
+            throw new JoiningMailException();
         }
-        return false;
     }
 
     private String cacheCertifyNumAndEmail(Long sessionId, String totalEmail) {
@@ -396,7 +332,7 @@ public class AuthService {
     }
 
     private PCollege findByPCollegeId(Long collegeId) {
-        return pCollegeRepository.findById(collegeId).orElse(null);
+        return pCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
     }
 
     private boolean isForbiddenMail(String uEmail, MCollege mCollege) {
@@ -450,18 +386,13 @@ public class AuthService {
     }
 
     private Member findByUEmailAndCollege(String uEmail, MCollege college) {
-        Member member = memberRepository.findByuEmailAndcollege(uEmail, college).orElse(null);
-        if (isNull(member)) {
-            return null;
-        }
-        return member;
+        return memberRepository.findByuEmailAndcollege(uEmail, college).orElse(null);
     }
 
-    private Member findByLoginId(String loginId) {
-        Member member = memberRepository.findByloginId(loginId).orElse(null);
-        if (isNull(member)) {
-            return null;
+    private void checkExistedLoginId(String loginId) {
+        Optional<Member> member = memberRepository.findByloginId(loginId);
+        if (member.isPresent()) {
+            throw new LoginIdAlreadyExistedException();
         }
-        return member;
     }
 }
