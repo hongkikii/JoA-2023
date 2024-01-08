@@ -9,7 +9,7 @@ on:
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
   LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-  LIGHTSAIL_USERNAME: bitnami
+  LIGHTSAIL_USERNAME: ubuntu
   AWS_REGION: ap-northeast-2
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
           username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: 'build/libs/*'
-          target: '/home/bitnami/JoA-2023/app.jar'
+          target: '/home/ubuntu/JoA-2023/app.jar'
 
       - name: Restart Application
         uses: appleboy/ssh-action@master
