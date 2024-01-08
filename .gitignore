@@ -41,7 +41,6 @@ out/
 /src/test/java/com/mjuAppSW/
 
 # Setting file
-*.properties
 application-dev.yml
 /src/main/resources/import.sql
 .DS_Store
