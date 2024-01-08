@@ -41,7 +41,6 @@ out/
 /src/test/java/com/mjuAppSW/
 
 # Setting file
-*.jar
 *.properties
 application-dev.yml
 /src/main/resources/import.sql
