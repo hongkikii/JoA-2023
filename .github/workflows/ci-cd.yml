@@ -54,4 +54,4 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: 'sudo systemctl restart j-project-2023'
+          script: 'sudo systemctl restart sshd'
