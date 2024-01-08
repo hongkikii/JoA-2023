@@ -43,7 +43,7 @@ out/
 # Setting file
 *.jar
 *.properties
-*.yml
+application-dev.yml
 /src/main/resources/import.sql
 .DS_Store
 

@@ -1,20 +1,20 @@
 package com.mjuAppSW.joA.domain.heart.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@Schema(description = "하트 전송 Request")
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class HeartRequest {
-    @JsonProperty("giveId")
     @NotNull
-    private Long giveId;
-
-    @JsonProperty("takeId")
+    private final Long giveId;
     @NotNull
-    private Long takeId;
-
-    @JsonProperty("named")
+    private final Long takeId;
     @NotNull
-    private Boolean named;
+    private final Boolean named;
 }

@@ -1,7 +1,7 @@
 package com.mjuAppSW.joA.domain.roomInMember;
 
+import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.domain.member.Member;
-import com.mjuAppSW.joA.domain.member.MemberAccessor;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
 import com.mjuAppSW.joA.domain.message.MessageRepository;
 import com.mjuAppSW.joA.domain.message.dto.CurrentMessageInfo;
@@ -30,18 +30,18 @@ public class RoomInMemberService {
     private RoomRepository roomRepository;
     private MemberRepository memberRepository;
     private MessageRepository messageRepository;
-    private MemberAccessor memberAccessor;
+    private MemberChecker memberChecker;
 
     @Autowired
     public RoomInMemberService(RoomInMemberRepository roomInMemberRepository, RoomService roomService,
                                MemberRepository memberRepository, RoomRepository roomRepository,
-                               MessageRepository messageRepository, MemberAccessor memberAccessor){
+                               MessageRepository messageRepository, MemberChecker memberChecker){
         this.roomInMemberRepository = roomInMemberRepository;
         this.roomService = roomService;
         this.memberRepository = memberRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
-        this.memberAccessor = memberAccessor;
+        this.memberChecker = memberChecker;
     }
 
     public String decrypt(String cipherText, String encryptionKey){
@@ -89,7 +89,7 @@ public class RoomInMemberService {
     public RoomListVO getRoomList(Long memberId) {
         Member member = memberRepository.findBysessionId(memberId).orElse(null);
         if(member != null){
-            if(memberAccessor.isStopped(member.getSessionId())){return new RoomListVO(null, "3");}
+            if(memberChecker.isStopped(member)) {return new RoomListVO(null, "3");}
             List<RoomInMember> memberList = roomInMemberRepository.findByAllMember(member);
             List<RoomInfoVO> roomInfoCIsNullList = new ArrayList<>();
             List<RoomInfoVO> roomInfoCIsNotNullList = new ArrayList<>();
@@ -97,10 +97,10 @@ public class RoomInMemberService {
             if(memberList.isEmpty() || member == null){
                 return new RoomListVO(null, "1");
             }
-            for(RoomInMember rim : memberList){
+            for(RoomInMember rim : memberList) {
                 List<RoomInMember> list = roomInMemberRepository.findByAllRoom(rim.getRoom());
                 for(RoomInMember rim1 : list){
-                    if(rim1.getMember() != member){
+                    if(rim1.getMember() != member) {
                         RoomInfo roomInfo = roomInMemberRepository.findRoomInfoValue(rim1.getMember(), rim1.getRoom());
                         CurrentMessageInfo currentMessageInfo = messageRepository.getCurrentMessageAndTime(rim1.getRoom());
                         Integer unCheckedMessage = messageRepository.countUnCheckedMessage(rim1.getRoom(), rim1.getMember());
