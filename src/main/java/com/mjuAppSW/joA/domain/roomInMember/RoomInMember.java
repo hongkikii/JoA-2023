@@ -48,4 +48,12 @@ public class RoomInMember {
         this.expired = expired;
         this.result = result;
     }
+
+    public void saveResult(String result) {
+        this.result = result;
+    }
+
+    public void updateExpired(String expired) {
+        this.expired = expired;
+    }
 }

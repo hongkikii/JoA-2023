@@ -9,11 +9,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MessageReportRepository extends JpaRepository<MessageReport, Long> {
     @Query("SELECT mr FROM MessageReport mr Where mr.message_id = :message")
-    MessageReport findByMessage(@Param("message") Message message);
+    Optional<MessageReport> findByMessage(@Param("message") Message message);
 
     @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.member.id = :memberId1")
     List<MessageReport> findByMemberId(@Param("memberId1") Long memberId1);

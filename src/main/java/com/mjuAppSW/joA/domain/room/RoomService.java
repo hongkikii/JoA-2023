@@ -1,14 +1,17 @@
 package com.mjuAppSW.joA.domain.room;
 
-import com.mjuAppSW.joA.domain.message.Message;
+import static com.mjuAppSW.joA.common.constant.Constants.Room.*;
+
 import com.mjuAppSW.joA.domain.message.MessageRepository;
 import com.mjuAppSW.joA.domain.report.message.MessageReport;
 import com.mjuAppSW.joA.domain.report.message.MessageReportRepository;
-import com.mjuAppSW.joA.domain.room.dto.RoomResponse;
+import com.mjuAppSW.joA.domain.room.dto.response.RoomResponse;
+import com.mjuAppSW.joA.domain.room.exception.OverOneDayException;
+import com.mjuAppSW.joA.domain.room.exception.RoomNotFoundException;
 import com.mjuAppSW.joA.domain.roomInMember.RoomInMemberRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,22 +21,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class RoomService {
 
-    private RoomRepository roomRepository;
-    private RoomInMemberRepository roomInMemberRepository;
-    private MessageRepository messageRepository;
-    private MessageReportRepository messageReportRepository;
-
-    @Autowired
-    public RoomService(RoomRepository roomRepository, RoomInMemberRepository roomInMemberRepository,
-                       MessageRepository messageRepository, MessageReportRepository messageReportRepository){
-        this.roomRepository = roomRepository;
-        this.roomInMemberRepository = roomInMemberRepository;
-        this.messageRepository = messageRepository;
-        this.messageReportRepository = messageReportRepository;
-    }
+    private final RoomRepository roomRepository;
+    private final RoomInMemberRepository roomInMemberRepository;
+    private final MessageRepository messageRepository;
+    private final MessageReportRepository messageReportRepository;
 
     public String makeRandomString(){
         byte[] randomBytes = new byte[16];
@@ -43,21 +38,20 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomResponse createRoom(){
+    public RoomResponse createRoom(LocalDateTime createdRoomDate){
         Room room = Room.builder()
-                .date(LocalDateTime.now())
-                .status("1")
-                .encryptKey(makeRandomString())
-                .build();
-        Room returnRoom = roomRepository.save(room);
-        return new RoomResponse(returnRoom.getId());
+            .date(createdRoomDate)
+            .status(NOT_EXTEND)
+            .encryptKey(makeRandomString())
+            .build();
+        Room saveRoom = roomRepository.save(room);
+        return RoomResponse.of(saveRoom.getId());
     }
 
-    public Boolean checkRoomId(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElse(null);
-        if(room != null){
-            return true;
-        }return false;
+    @Transactional
+    public void updateStatusAndDate(Long roomId, LocalDateTime updateRoomStatusDate){
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        room.updateStatusAndDate(updateRoomStatusDate);
     }
 
     public Long calculationHour(LocalDateTime getTime){
@@ -67,18 +61,12 @@ public class RoomService {
         return hours;
     }
 
-    public Integer checkCreateAtRoom(Long roomId){
-        Optional<Room> checkCreatedAt = Optional.ofNullable(roomRepository.findByDate(roomId));
-        if(checkCreatedAt.isPresent()){
-            LocalDateTime date = checkCreatedAt.get().getDate();
-            Long hours = calculationHour(date);
-            if(hours >= 24){
-                return 0;
-            }else{
-                return 1;
-            }
-        }else{
-            return 2;
+    public void checkCreateAtRoom(Long roomId){
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        LocalDateTime getDate = room.getDate();
+        Long hours = calculationHour(getDate);
+        if(hours < ONE_DAY_HOURS){
+            throw new OverOneDayException();
         }
     }
 
@@ -88,19 +76,14 @@ public class RoomService {
             String status = room.getStatus();
             LocalDateTime date = room.getDate();
             Long hours = calculationHour(date);
-            if(status.equals("0")){
-                if(hours >= 168){return 7;}
+            if(status.equals(EXTEND)){
+                if(hours >= SEVEN_DAY_HOURS){return 7;}
             }else {
-                if (hours >= 24) {return 1;}
+                if (hours >= ONE_DAY_HOURS) {return 1;}
             }
             return 0;
         }
         return 9;
-    }
-
-    @Transactional
-    public void updateRoom(Long roomId, String status){
-        roomRepository.updateCreatedAtAndStatus(roomId, LocalDateTime.now(), status);
     }
 
     @Scheduled(cron = "0 0 0,12 * * *") // Run at 00, 12 o'clock every day
@@ -142,5 +125,4 @@ public class RoomService {
         roomInMemberRepository.deleteByRoom(room);
         roomRepository.deleteById(room.getId());
     }
-
 }

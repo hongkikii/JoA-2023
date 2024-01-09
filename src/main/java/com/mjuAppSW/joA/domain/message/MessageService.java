@@ -1,42 +1,42 @@
 package com.mjuAppSW.joA.domain.message;
 
+import com.mjuAppSW.joA.common.session.SessionManager;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.message.dto.MessageList;
-import com.mjuAppSW.joA.domain.message.dto.MessageResponse;
+import com.mjuAppSW.joA.domain.message.dto.vo.Messages;
+import com.mjuAppSW.joA.domain.message.dto.response.MessageResponse;
 import com.mjuAppSW.joA.domain.room.Room;
 import com.mjuAppSW.joA.domain.room.RoomRepository;
+import com.mjuAppSW.joA.domain.room.exception.RoomNotFoundException;
 import com.mjuAppSW.joA.domain.roomInMember.RoomInMember;
 import com.mjuAppSW.joA.domain.roomInMember.RoomInMemberRepository;
+import com.mjuAppSW.joA.domain.roomInMember.exception.RoomInMemberNotFoundException;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class MessageService {
     private static String alg = "AES/CBC/PKCS5Padding";
-    private MessageRepository messageRepository;
-    private RoomRepository roomRepository;
-    private MemberRepository memberRepository;
-    private RoomInMemberRepository roomInMemberRepository;
-
-    @Autowired
-    public MessageService(MessageRepository messageRepository, RoomRepository roomRepository,
-                          MemberRepository memberRepository, RoomInMemberRepository roomInMemberRepository){
-        this.messageRepository = messageRepository;
-        this.roomRepository = roomRepository;
-        this.memberRepository = memberRepository;
-        this.roomInMemberRepository = roomInMemberRepository;
-    }
+    private final MessageRepository messageRepository;
+    private final RoomRepository roomRepository;
+    private final MemberRepository memberRepository;
+    private final RoomInMemberRepository roomInMemberRepository;
+    private final SessionManager sessionManager;
 
     public Long saveMessage(Long roomId, Long memberId, String content, String isChecked) throws Exception {
         Room room = roomRepository.findById(roomId).orElse(null);
@@ -55,29 +55,45 @@ public class MessageService {
         return null;
     }
 
-    public MessageList loadMessage(Long roomId, Long memberId) {
-        Room room = roomRepository.findById(roomId).orElse(null);
-        Member member = memberRepository.findBysessionId(memberId).orElse(null);
-        if(room != null && member != null){
-            RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member);
-            if(roomInMember == null){
-                return new MessageList(new ArrayList<>(), "2");
-            }
+    // public MessageList loadMessage(Long roomId, Long memberId) {
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     Member member = memberRepository.findBysessionId(memberId).orElse(null);
+    //     if(room != null && member != null){
+    //         RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member);
+    //         if(roomInMember == null){
+    //             return new MessageList(new ArrayList<>(), "2");
+    //         }
+    //
+    //         List<Message> messageList = messageRepository.findByRoom(room);
+    //         if(messageList.isEmpty()){
+    //             return new MessageList(new ArrayList<>(), "1");
+    //         }
+    //
+    //         List<MessageResponse> messageResponseList = new ArrayList<>();
+    //         for(Message message : messageList){
+    //             String getMessage = makeMessageContent(message, member, room);
+    //             MessageResponse messageResponse = new MessageResponse(getMessage);
+    //             messageResponseList.add(messageResponse);
+    //         }
+    //         return new MessageList(messageResponseList, "0");
+    //     }
+    //     return new MessageList(new ArrayList<>(), "3");
+    // }
+    public MessageResponse loadMessage(Long roomId, Long memberId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        Member member = sessionManager.findBySessionId(memberId);
+        RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(
+            RoomInMemberNotFoundException::new);
 
-            List<Message> messageList = messageRepository.findByRoom(room);
-            if(messageList.isEmpty()){
-                return new MessageList(new ArrayList<>(), "1");
-            }
+        List<Message> messageList = messageRepository.findByRoom(room);
+        if(messageList.isEmpty()){ return MessageResponse.of(new ArrayList<>());}
 
-            List<MessageResponse> messageResponseList = new ArrayList<>();
-            for(Message message : messageList){
-                String getMessage = makeMessageContent(message, member, room);
-                MessageResponse messageResponse = new MessageResponse(getMessage);
-                messageResponseList.add(messageResponse);
-            }
-            return new MessageList(messageResponseList, "0");
-        }
-        return new MessageList(new ArrayList<>(), "3");
+        List<Messages> messagesList = messageList.stream()
+            .map(message -> makeMessageContent(message, member, room))
+            .map(Messages::new)
+            .collect(Collectors.toList());
+
+        return MessageResponse.of(messagesList);
     }
 
     private String makeMessageContent(Message message, Member member, Room room) {

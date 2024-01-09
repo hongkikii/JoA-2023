@@ -1,16 +1,25 @@
 package com.mjuAppSW.joA.domain.roomInMember.dto;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
+@Getter
 public class RoomListVO {
-    List<RoomListDTO> roomDTOList;
-    private String status;
+    private Long roomId;
+    private String name;
+    private String urlCode;
+    private String content;
+    private String unCheckedMessage;
 
-    public RoomListVO(List roomDTOList, String status){
-        this.roomDTOList = roomDTOList;
-        this.status = status;
+    @Builder
+    public RoomListVO(Long roomId, String name, String urlCode, String content, String unCheckedMessage) {
+        this.roomId = roomId;
+        this.name = name;
+        this.urlCode = urlCode;
+        this.content = content;
+        this.unCheckedMessage = unCheckedMessage;
     }
 }
