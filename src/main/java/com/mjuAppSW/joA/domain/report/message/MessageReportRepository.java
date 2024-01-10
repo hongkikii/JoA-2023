@@ -1,6 +1,8 @@
 package com.mjuAppSW.joA.domain.report.message;
 
 import com.mjuAppSW.joA.domain.message.Message;
+import com.mjuAppSW.joA.domain.room.Room;
+
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,6 +21,9 @@ public interface MessageReportRepository extends JpaRepository<MessageReport, Lo
     @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.member.id = :memberId1")
     List<MessageReport> findByMemberId(@Param("memberId1") Long memberId1);
 
-    @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.room.id = :roomId")
-    List<MessageReport> findByRoomId(@Param("roomId") Long roomId);
+    // @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.room.id = :roomId")
+    // List<MessageReport> findByRoomId(@Param("roomId") Long roomId);
+
+    @Query("SELECT mr FROM MessageReport mr WHERE mr.message_id.room = :room")
+    List<MessageReport> findByRoomId(@Param("room") Room room);
 }

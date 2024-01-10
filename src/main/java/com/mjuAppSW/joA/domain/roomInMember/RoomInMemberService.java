@@ -5,7 +5,6 @@ import static com.mjuAppSW.joA.common.constant.Constants.RoomInMember.*;
 import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.MemberNotFoundException;
 import com.mjuAppSW.joA.domain.message.MessageRepository;
 import com.mjuAppSW.joA.domain.message.dto.vo.CurrentMessageVO;
 import com.mjuAppSW.joA.domain.room.Room;
@@ -20,6 +19,7 @@ import com.mjuAppSW.joA.domain.roomInMember.dto.response.RoomListResponse;
 import com.mjuAppSW.joA.domain.roomInMember.dto.response.UserInfoResponse;
 import com.mjuAppSW.joA.domain.roomInMember.dto.response.VoteResponse;
 import com.mjuAppSW.joA.domain.roomInMember.vo.RoomInfoExceptMessageVO;
+import com.mjuAppSW.joA.domain.roomInMember.vo.RoomInfoIncludeMessageVO;
 import com.mjuAppSW.joA.domain.roomInMember.vo.RoomInfoVO;
 import com.mjuAppSW.joA.domain.roomInMember.vo.UserInfoVO;
 import com.mjuAppSW.joA.domain.roomInMember.exception.AlreadyExistedRoomInMemberException;
@@ -64,33 +64,49 @@ public class RoomInMemberService {
         return null;
     }
 
-    public Boolean findByRoomIdAndMemberId(Long roomId, Long memberId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        Member member = memberRepository.findById(memberId).orElse(null);
-        if(room != null && member != null){
-            RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member);
-            if(roomInMember != null){
-                String status = roomInMember.getExpired();
-                if(status == "0") return true;
-            }return true;
-        }return false;
-    }
+    // public Boolean findByRoomIdAndMemberId(Long roomId, Long memberId){
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     Member member = memberRepository.findById(memberId).orElse(null);
+    //     if(room != null && member != null){
+    //         RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member);
+    //         if(roomInMember != null){
+    //             String status = roomInMember.getExpired();
+    //             if(status == "0") return true;
+    //         }return true;
+    //     }return false;
+    // }
 
+    // public Boolean findByRoom(Long roomId){
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     if(room != null){
+    //         List<RoomInMember> roomInMemberList = roomInMemberRepository.findAllRoom(room);
+    //         if(roomInMemberList.isEmpty() || roomInMemberList == null){
+    //             return true;
+    //         }
+    //         for(RoomInMember roomInMember : roomInMemberList){
+    //             if(roomInMember.getExpired().equals("0")){
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
     public Boolean findByRoom(Long roomId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        if(room != null){
-            List<RoomInMember> roomInMemberList = roomInMemberRepository.findAllRoom(room);
-            if(roomInMemberList.isEmpty() || roomInMemberList == null){
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+
+        List<RoomInMember> roomInMemberList = roomInMemberRepository.findAllRoom(room);
+        if(roomInMemberList.isEmpty() || roomInMemberList == null){
+            return true;
+        }
+        for(RoomInMember roomInMember : roomInMemberList) {
+            if (roomInMember.getExpired().equals(EXIT)) {
                 return true;
             }
-            for(RoomInMember roomInMember : roomInMemberList){
-                if(roomInMember.getExpired().equals("0")){
-                    return true;
-                }
-            }
         }
+
         return false;
     }
+
     // public RoomListVO getRoomList(Long memberId) {
     //     Member member = memberRepository.findBysessionId(memberId).orElse(null);
     //     if(member != null){
@@ -205,34 +221,49 @@ public class RoomInMemberService {
 
 
     public RoomListDTO getUpdateRoom(Room room, Member member){
-        RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member);
+        RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(RoomInMemberNotFoundException::new);
         if(roomInMember != null){
-            RoomInfoExceptMessageVO rlr = roomInMemberRepository.findRoomInfoValue(roomInMember.getMember(), roomInMember.getRoom());
+            RoomInfoIncludeMessageVO rlr = roomInMemberRepository.findRoomInfoIncludeMessage(roomInMember.getRoom(), roomInMember.getMember())
+                .orElseThrow(RoomInMemberNotFoundException::new);
             Integer unCheckedMessageCount = messageRepository.countUnCheckedMessage(roomInMember.getRoom(), roomInMember.getMember());
             if(rlr != null){
                 String decryptedString = decrypt(rlr.getContent(), rlr.getRoom().getEncryptKey());
-                RoomListDTO roomDTO = new RoomListDTO(rlr.getRoom().getId(), rlr.getName(), rlr.getUrlCode(), decryptedString, String.valueOf(unCheckedMessageCount));
-                return roomDTO;
+                RoomListDTO roomListDTO = new RoomListDTO(rlr.getRoom().getId(), rlr.getName(), rlr.getUrlCode(), decryptedString, String.valueOf(unCheckedMessageCount));
+                return roomListDTO;
             }
         }
         return null;
     }
 
+    // @Transactional
+    // public Boolean createRoom(Long roomId, Long memberId){
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     Member member = memberRepository.findById(memberId).orElse(null);
+    //     if(room != null && member != null){
+    //         RoomInMember roomInMember = RoomInMember.builder()
+    //                 .room(room)
+    //                 .member(member)
+    //                 .expired("1")
+    //                 .result("1")
+    //                 .build();
+    //         RoomInMember saveRoomInMember = roomInMemberRepository.save(roomInMember);
+    //         if(saveRoomInMember != null) {return true;}
+    //     }
+    //     return false;
+    // }
     @Transactional
-    public Boolean createRoom(Long roomId, Long memberId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        Member member = memberRepository.findById(memberId).orElse(null);
-        if(room != null && member != null){
-            RoomInMember roomInMember = RoomInMember.builder()
-                    .room(room)
-                    .member(member)
-                    .expired("1")
-                    .result("1")
-                    .build();
-            RoomInMember saveRoomInMember = roomInMemberRepository.save(roomInMember);
-            if(saveRoomInMember != null) {return true;}
-        }
-        return false;
+    public void createRoom(Long roomId, Long memberId){
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        Member member = memberChecker.findById(memberId);
+
+        RoomInMember roomInMember = RoomInMember.builder()
+            .room(room)
+            .member(member)
+            .expired(NOT_EXIT)
+            .result(DISAPPROVE_OR_BEFORE_VOTE)
+            .build();
+
+        roomInMemberRepository.save(roomInMember);
     }
 
     // public VoteDTO saveVoteResult(Long roomId, Long memberId, String result){
@@ -254,7 +285,7 @@ public class RoomInMemberService {
     @Transactional
     public VoteResponse saveVoteResult(VoteRequest request){
         Room room = roomRepository.findById(request.getRoomId()).orElseThrow(RoomNotFoundException::new);
-        Member member = sessionManager.findBySessionId(request.getMemberId());
+        Member member = memberChecker.findBySessionId(request.getMemberId());
         RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(RoomInMemberNotFoundException::new);
 
         roomInMember.saveResult(request.getResult());
@@ -262,17 +293,17 @@ public class RoomInMemberService {
         return VoteResponse.of(anotherRoomInMember.getRoom().getId(), anotherRoomInMember.getMember().getId(), anotherRoomInMember.getResult());
     }
 
-    public Boolean checkRoomIdAndMemberId(Long roomId, Long memberId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        Member member = memberRepository.findBysessionId(memberId).orElse(null);
-        if(room != null && member != null){
-            RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member);
-            if(roomInMember != null){
-                return true;
-            }
-        }
-        return false;
-    }
+    // public Boolean checkRoomIdAndMemberId(Long roomId, Long memberId){
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     Member member = memberRepository.findBysessionId(memberId).orElse(null);
+    //     if(room != null && member != null){
+    //         RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(RoomInMemberNotFoundException::new);
+    //         if(roomInMember != null){
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     // public Boolean checkRoomInMember(Long memberId1, Long memberId2){
     //     Member member1 = memberRepository.findBysessionId(memberId1).orElse(null);
@@ -292,8 +323,8 @@ public class RoomInMemberService {
     // }
 
     public void checkRoomInMember(CheckRoomInMemberRequest request){
-        Member member1 = sessionManager.findBySessionId(request.getMemberId1());
-        Member member2 = memberRepository.findById(request.getMemberId2()).orElseThrow(MemberNotFoundException::new);
+        Member member1 = memberChecker.findBySessionId(request.getMemberId1());
+        Member member2 = memberChecker.findById(request.getMemberId2());
         List<RoomInMember> getRoomInMembers = roomInMemberRepository.checkRoomInMember(member1, member2);
         for(RoomInMember rim : getRoomInMembers){
             if(rim.getExpired().equals(NOT_EXIT)){throw new AlreadyExistedRoomInMemberException();}
@@ -339,7 +370,7 @@ public class RoomInMemberService {
     // }
     public UserInfoResponse getUserInfo(Long roomId, Long memberId){
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
-        Member member = sessionManager.findBySessionId(memberId);
+        Member member = memberChecker.findBySessionId(memberId);
         RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(RoomInMemberNotFoundException::new);
 
         UserInfoVO userInfoVO = roomInMemberRepository.getUserInfo(room, member);
@@ -359,7 +390,7 @@ public class RoomInMemberService {
     @Transactional
     public void updateExpired(UpdateExpiredRequest request) {
         Room room = roomRepository.findById(request.getRoomId()).orElseThrow(RoomNotFoundException::new);
-        Member member = sessionManager.findBySessionId(request.getMemberId());
+        Member member = memberChecker.findBySessionId(request.getMemberId());
         RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(RoomInMemberNotFoundException::new);
 
         roomInMember.updateExpired(request.getExpired());
@@ -385,29 +416,33 @@ public class RoomInMemberService {
         return false;
     }
 
+    // public Boolean checkExpired(Long roomId, Long memberId){
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     Member member = memberRepository.findById(memberId).orElse(null);
+    //     if (room != null && member != null) {
+    //         RoomInMember rim = roomInMemberRepository.checkExpired(room, member);
+    //         if (rim.getExpired().equals("1")) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
     public Boolean checkExpired(Long roomId, Long memberId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        Member member = memberRepository.findById(memberId).orElse(null);
-        if (room != null && member != null) {
-            RoomInMember rim = roomInMemberRepository.checkExpired(room, member);
-            if (rim.getExpired().equals("1")) {
-                return true;
-            }
-        }
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        Member member = memberChecker.findById(memberId);
+        RoomInMember roomInMember = roomInMemberRepository.findByRoomAndMember(room, member).orElseThrow(RoomInMemberNotFoundException::new);
+
+        if(roomInMember.getExpired().equals(NOT_EXIT)){return true;}
         return false;
     }
 
     public Boolean checkIsWithDrawal(Long roomId, Long memberId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        Member member = memberRepository.findById(memberId).orElse(null);
-        if(room != null && member != null) {
-            RoomInMember rim = roomInMemberRepository.checkExpired(room, member);
-            Member getMember = memberRepository.findById(rim.getMember().getId()).orElse(null);
-            if (getMember != null) {
-                return true;
-            }
-            return false;
-        }
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        Member member = memberChecker.findById(memberId);
+        RoomInMember rim = roomInMemberRepository.checkOpponentExpired(room, member);
+
+        Member opponentMember = memberChecker.findById(rim.getMember().getId());
+        if (opponentMember != null) return true;
         return false;
     }
 }

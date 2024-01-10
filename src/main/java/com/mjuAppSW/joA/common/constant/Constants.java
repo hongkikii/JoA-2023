@@ -130,6 +130,8 @@ public class Constants {
         public static String NOT_EXTEND = "1";
         public static Integer ONE_DAY_HOURS = 24;
         public static Integer SEVEN_DAY_HOURS = 168;
+        public static Integer OVER_ONE_DAY = 1;
+        public static Integer OVER_SEVEN_DAY = 7;
     }
 
     public static class RoomInMember{
@@ -144,6 +146,16 @@ public class Constants {
         public static Integer REPORT = 2;
         public static Integer CLEAR = 3;
         public static Integer NINETY_DAY_HOURS = 2160;
+    }
+
+    public static class WebSocketHandler{
+        public static String R_SEPARATOR = "R";
+        public static String M_SEPARATOR = "M";
+        public static Integer LIMIT_SEPARATOR = 4;
+        public static String SEPARATOR = " ";
+        public static Integer OVER_ONE_DAY = 1;
+        public static Integer OVER_SEVEN_DAY = 7;
+        public static String OPPONENT_CHECK_MESSAGE = "0";
     }
 
     public static Integer NORMAL_OPERATION = 0;

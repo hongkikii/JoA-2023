@@ -1,5 +1,6 @@
 package com.mjuAppSW.joA.domain.room;
 
+import static com.mjuAppSW.joA.common.constant.Constants.*;
 import static com.mjuAppSW.joA.common.constant.Constants.Room.*;
 
 import com.mjuAppSW.joA.domain.message.MessageRepository;
@@ -19,6 +20,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -70,20 +72,33 @@ public class RoomService {
         }
     }
 
+    // public Integer checkTime(Long roomId){
+    //     Room room = roomRepository.findById(roomId).orElse(null);
+    //     if(room != null){
+    //         String status = room.getStatus();
+    //         LocalDateTime date = room.getDate();
+    //         Long hours = calculationHour(date);
+    //         if(status.equals(EXTEND)){
+    //             if(hours >= SEVEN_DAY_HOURS){return 7;}
+    //         }else {
+    //             if (hours >= ONE_DAY_HOURS) {return 1;}
+    //         }
+    //         return 0;
+    //     }
+    //     return 9;
+    // }
     public Integer checkTime(Long roomId){
-        Room room = roomRepository.findById(roomId).orElse(null);
-        if(room != null){
-            String status = room.getStatus();
-            LocalDateTime date = room.getDate();
-            Long hours = calculationHour(date);
-            if(status.equals(EXTEND)){
-                if(hours >= SEVEN_DAY_HOURS){return 7;}
-            }else {
-                if (hours >= ONE_DAY_HOURS) {return 1;}
-            }
-            return 0;
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+
+        String status = room.getStatus();
+        LocalDateTime date = room.getDate();
+        Long hours = calculationHour(date);
+        if(status.equals(EXTEND)){
+            if (hours >= SEVEN_DAY_HOURS){return OVER_SEVEN_DAY;}
+        }else {
+            if (hours >= ONE_DAY_HOURS) {return OVER_ONE_DAY;}
         }
-        return 9;
+        return NORMAL_OPERATION;
     }
 
     @Scheduled(cron = "0 0 0,12 * * *") // Run at 00, 12 o'clock every day
