@@ -77,10 +77,6 @@ public class Member {
         this.status = 0;
     }
 
-    public void changeName(String name) {
-        this.name = name;
-    }
-
     public void changeUrlCode(String urlCode) {
         this.urlCode = urlCode;
     }

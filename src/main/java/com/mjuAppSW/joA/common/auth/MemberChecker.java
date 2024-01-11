@@ -2,7 +2,7 @@ package com.mjuAppSW.joA.common.auth;
 
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.domain.member.MemberRepository;
-import com.mjuAppSW.joA.domain.member.exception.LoginIdNotAuthException;
+import com.mjuAppSW.joA.domain.member.exception.InvalidLoginIdException;
 import com.mjuAppSW.joA.domain.memberProfile.exception.AccessForbiddenException;
 import com.mjuAppSW.joA.domain.memberProfile.exception.MemberNotFoundException;
 import com.mjuAppSW.joA.geography.location.exception.AccessStoppedException;
@@ -35,7 +35,7 @@ public class MemberChecker {
 
     public Member findByLoginId(String loginId) {
         return memberRepository.findByloginId(loginId)
-                .orElseThrow(LoginIdNotAuthException::new);
+                .orElseThrow(MemberNotFoundException::new);
     }
 
     public void checkStopped(Member member) {
