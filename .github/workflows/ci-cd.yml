@@ -57,5 +57,6 @@ jobs:
           script: |
             cd /home/ubuntu/JoA-2023/
             pkill -f "java -jar JoA.jar"
+            kill -TERM $(pgrep -f "java -jar JoA.jar")
             wait $(pgrep -f "java -jar JoA.jar")
             nohup java -jar JoA.jar &
