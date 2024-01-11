@@ -56,7 +56,6 @@ public class MemberApiController {
             @ApiResponse(responseCode = "200", description = "인증 번호 검증 확인 코드 반환"),
             @ApiResponse(responseCode = "404", description = "P001: 학교 정보를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "404", description = "M007: 세션 id가 유효하지 않습니다."),
-            @ApiResponse(responseCode = "400", description = "M008: 이메일 인증이 완료되지 않았습니다."),
             @ApiResponse(responseCode = "400", description = "M009: 인증번호가 올바르지 않습니다."),
     })
     @PostMapping("/certify-num/verify")

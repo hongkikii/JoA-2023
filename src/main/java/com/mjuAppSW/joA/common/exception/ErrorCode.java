@@ -28,7 +28,7 @@ public enum ErrorCode {
     MEMBER_ALREADY_EXISTED(409, "M005", "이미 존재하는 사용자입니다."),
     JOINING_MAIL(409, "M006", "사용 중인 이메일입니다."),
     SESSION_NOT_FOUND(404, "M007", "세션 id가 유효하지 않습니다."),
-    MAIL_NOT_VERIFY(400, "M008", "이메일 인증이 완료되지 않았습니다"),
+    MAIL_NOT_VERIFY(400, "M008", "이메일 인증이 완료되지 않았습니다."),
     INVALID_CERTIFY_NUMBER(400, "M009", "인증번호가 올바르지 않습니다."),
     INVALID_LOGIN_ID(400, "M010", "올바른 아이디 형식이 아닙니다."),
     LOGIN_ID_ALREADY_EXISTED(409, "M011", "이미 사용 중인 아이디입니다."),
