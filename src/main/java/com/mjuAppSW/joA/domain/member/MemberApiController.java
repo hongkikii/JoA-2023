@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,7 +56,6 @@ public class MemberApiController {
             @ApiResponse(responseCode = "200", description = "인증 번호 검증 확인 코드 반환"),
             @ApiResponse(responseCode = "404", description = "P001: 학교 정보를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "404", description = "M007: 세션 id가 유효하지 않습니다."),
-            @ApiResponse(responseCode = "400", description = "M008: 이메일 인증이 완료되지 않았습니다."),
             @ApiResponse(responseCode = "400", description = "M009: 인증번호가 올바르지 않습니다."),
     })
     @PostMapping("/certify-num/verify")
@@ -68,7 +68,7 @@ public class MemberApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "아이디 중복 검증 확인 코드 반환"),
             @ApiResponse(responseCode = "400", description = "M010: 올바른 아이디 형식이 아닙니다."),
-            @ApiResponse(responseCode = "404", description = "M007: 세션 id가 유효하지 않습니다."),
+            @ApiResponse(responseCode = "400", description = "M008: 이메일 인증이 완료되지 않았습니다."),
             @ApiResponse(responseCode = "409", description = "M011: 이미 사용 중이 아이디입니다."),
 
     })
@@ -90,7 +90,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "403", description = "M014: 접근이 제한된 이메일입니다."),
 
     })
-    @PostMapping("/join")
+    @PostMapping
     public ResponseEntity<Void> join(@RequestBody @Valid JoinRequest request) {
         memberService.join(request);
         return ResponseEntity.ok().build();
@@ -125,7 +125,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "404", description = "P001: 학교 정보를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
     })
-    @PostMapping("/id/find")
+    @GetMapping("/id/find")
     public ResponseEntity<Void> findId(@RequestBody @Valid FindIdRequest request) {
         memberService.findId(request);
         return ResponseEntity.ok().build();
@@ -136,7 +136,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 웹메일 전송 후 확인 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M013: 아이디가 존재하지 않습니다."),
     })
-    @PostMapping ("/password/find")
+    @PatchMapping("/password/find")
     public ResponseEntity<Void> findPassword(@PathVariable @Valid FindPasswordRequest request) {
         memberService.findPassword(request);
         return ResponseEntity.ok().build();
@@ -148,7 +148,7 @@ public class MemberApiController {
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "404", description = "M015: 비밀번호가 올바르지 않습니다."),
     })
-    @PostMapping("/password")
+    @PatchMapping("/password")
     public ResponseEntity<Void> transPassword(@RequestBody @Valid TransPasswordRequest request) {
         memberService.transPassword(request);
         return ResponseEntity.ok().build();

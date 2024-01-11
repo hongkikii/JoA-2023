@@ -12,7 +12,6 @@ import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
 import static com.mjuAppSW.joA.common.constant.Constants.MAIL.CERTIFY_NUMBER_IS;
 import static com.mjuAppSW.joA.common.constant.Constants.MAIL.TEMPORARY_PASSWORD_IS;
 import static com.mjuAppSW.joA.common.constant.Constants.MAIL.USER_ID_IS;
-import static java.util.Objects.isNull;
 
 import com.mjuAppSW.joA.common.auth.MemberChecker;
 import com.mjuAppSW.joA.domain.college.MCollege;
@@ -30,9 +29,9 @@ import com.mjuAppSW.joA.domain.member.exception.InvalidLoginIdException;
 import com.mjuAppSW.joA.domain.member.exception.InvalidPasswordException;
 import com.mjuAppSW.joA.domain.member.exception.JoiningMailException;
 import com.mjuAppSW.joA.domain.member.exception.LoginIdAlreadyExistedException;
-import com.mjuAppSW.joA.domain.member.exception.LoginIdNotAuthException;
+import com.mjuAppSW.joA.domain.member.exception.LoginIdNotAuthorizedException;
 import com.mjuAppSW.joA.domain.member.exception.MailForbiddenException;
-import com.mjuAppSW.joA.domain.member.exception.MailNotCachedException;
+import com.mjuAppSW.joA.domain.member.exception.MailNotVerifyException;
 import com.mjuAppSW.joA.domain.member.exception.MemberAlreadyExistedException;
 import com.mjuAppSW.joA.domain.member.exception.PasswordNotFoundException;
 import com.mjuAppSW.joA.domain.member.exception.SessionNotFoundException;
@@ -48,7 +47,6 @@ import com.mjuAppSW.joA.common.storage.S3Uploader;
 import com.mjuAppSW.joA.geography.location.exception.CollegeNotFoundException;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
-import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,184 +85,18 @@ public class MemberService {
         return SessionIdResponse.of(sessionId);
     }
 
-    public void verifyCertifyNum(VerifyCertifyNumRequest request) {
-        MCollege college = findByMCollegeId(request.getCollegeId());
-        Long sessionId = request.getId();
-        String mail = request.getUEmail() + college.getDomain();
-
-        if(cacheManager.isNotExistedKey(CERTIFY_NUMBER + sessionId)) {
-            throw new SessionNotFoundException();
-        }
-        if (!isEqualCacheValue(BEFORE_EMAIL + sessionId, mail)) {
-            throw new MailNotCachedException();
-        }
-        if (!isEqualCacheValue(CERTIFY_NUMBER + sessionId, request.getCertifyNum())) {
-            throw new InvalidCertifyNumberException();
-        }
-        cacheEmailOnly(sessionId);
-    }
-
-    public void verifyId(Long sessionId, String loginId) {
-        if (isNotValidLoginId(loginId)) {
-            throw new InvalidLoginIdException();
-        }
-        if (isNotExistedCacheKey(AFTER_EMAIL + sessionId)) {
-            throw new SessionNotFoundException();
-        }
-        checkExistedLoginId(loginId);
-
-        if (isCachedLoginId(loginId) && !isMyJoiningId(sessionId, loginId)) {
-            throw new LoginIdAlreadyExistedException();
-        }
-        cacheLoginId(sessionId, loginId);
-    }
-
-    @Transactional
-    public void join(JoinRequest request) {
-        if (isNotValidPassword(request.getPassword())) {
-            throw new InvalidPasswordException();
-        }
-
-        Long sessionId = request.getId();
-        if (isNotExistedCacheKey(AFTER_EMAIL + sessionId)) {
-            throw new SessionNotFoundException();
-        }
-
-        String loginId = request.getLoginId();
-        if (isNotCachedLoginId(sessionId, request.getLoginId())) {
-            throw new LoginIdNotAuthException();
-        }
-
-        String eMail = cacheManager.getData(AFTER_EMAIL + sessionId);
-        String[] splitEMail = eMail.split(EMAIL_SPLIT);
-        String uEmail = splitEMail[0];
-        MCollege mCollege = findByDomain(splitEMail[1]);
-
-        PCollege pCollege = findByPCollegeId(mCollege.getId());
-
-        if (isForbiddenMail(uEmail, mCollege)) {
-            throw new MailForbiddenException();
-        }
-
-        // 비밀번호 암호화
-        String salt = BCrypt.gensalt();
-        String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
-
-        Member joinMember = Member.builder()
-                .name(request.getName())
-                .loginId(loginId)
-                .password(hashedPassword)
-                .salt(salt)
-                .uEmail(splitEMail[0])
-                .college(mCollege)
-                .sessionId(sessionId)
-                .build();
-        memberRepository.save(joinMember);
-
-        Location joinLocation = new Location(joinMember.getId(), pCollege);
-        locationRepository.save(joinLocation);
-        emptyCache(sessionId);
-    }
-
-    @Transactional
-    public SessionIdResponse login(LoginRequest request) {
-        Member findMember = memberChecker.findByLoginId(request.getLoginId());
-        findMember.makeSessionId(sessionManager.makeSessionId());
-
-        // 비밀번호 암호화
-        String salt = findMember.getSalt();
-        String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
-
-        if (!findMember.getPassword().equals(hashedPassword)) {
-            throw new PasswordNotFoundException();
-        }
-        return SessionIdResponse.of(findMember.getSessionId());
-    }
-
-    @Transactional
-    public void logout(Long sessionId) {
-        Member findMember = memberChecker.findBySessionId(sessionId);
-        Location location = locationRepository.findById(findMember.getId()).orElse(null);
-        if (!isNull(location)) {
-            Location newLocation = new Location(location.getId(), location.getCollege(),
-                    location.getPoint(), false, location.getUpdateDate());
-            locationRepository.save(newLocation);
-        }
-        findMember.expireSessionId();
-    }
-
-    @Transactional
-    public void findId(FindIdRequest request) {
-        MCollege college = findByMCollegeId(request.getCollegeId());
-
-        Member member = findByUEmailAndCollege(request.getUEmail(), college);
-        if (isNull(member)) {
-            throw new MemberNotFoundException();
-        }
-
-        mail(USER_ID_IS, member.getName(), member.getUEmail(), college.getDomain(), member.getLoginId());
-    }
-
-    @Transactional
-    public void findPassword(FindPasswordRequest request) {
-        Member member = memberChecker.findByLoginId(request.getLoginId());
-
-        // 비밀번호 암호화
-        String randomPassword = randomPassword();
-        String hashedRandomPassword = BCrypt.hashpw(randomPassword, member.getSalt());
-
-        mail(TEMPORARY_PASSWORD_IS, member.getName(), member.getUEmail(),
-                member.getCollege().getDomain(), randomPassword);
-        member.changePassword(hashedRandomPassword);
-    }
-
-    @Transactional
-    public void transPassword(TransPasswordRequest request) {
-        Member findMember = memberChecker.findBySessionId(request.getId());
-
-        // 비밀번호 암호화
-        String hashedCurrentPassword = BCrypt.hashpw(request.getCurrentPassword(), findMember.getSalt());
-        if (findMember.getPassword().equals(hashedCurrentPassword)) {
-            if (isNotValidPassword(request.getNewPassword())) {
-                throw new InvalidPasswordException();
-            }
-
-            // 비밀번호 암호화
-            String hashedNewPassword = BCrypt.hashpw(request.getNewPassword(), findMember.getSalt());
-            findMember.changePassword(hashedNewPassword);
-            return;
-        }
-        throw new PasswordNotFoundException();
-    }
-
-    @Transactional
-    public void withdrawal(Long sessionId) {
-        Member member = memberChecker.findBySessionId(sessionId);
-
-        if (s3Uploader.deletePicture(member.getUrlCode())) {
-            locationRepository.deleteById(member.getId());
-            member.expireSessionId();
-            member.changeWithdrawal(true);
-            member.changeUrlCode(EMPTY_STRING);
-            return;
-        }
-        throw new S3InvalidException();
-    }
-
     private MCollege findByMCollegeId(Long collegeId) {
         return mCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
     }
 
     private void checkExistedMember(String uEmail, MCollege college) {
-        if (!isNull(findByUEmailAndCollege(uEmail, college))) {
+        if (memberRepository.findByuEmailAndcollege(uEmail, college).isPresent()) {
             throw new MemberAlreadyExistedException();
         }
     }
 
     private void checkJoiningMail(String eMail) {
-        boolean isCertifyingMail = isExistedInCache(BEFORE_EMAIL, eMail);
-        boolean isJoiningMail = isExistedInCache(AFTER_EMAIL, eMail);
-        if (isJoiningMail || isCertifyingMail) {
+        if (cacheManager.isExistedValue(BEFORE_EMAIL, eMail) || cacheManager.isExistedValue(AFTER_EMAIL, eMail)) {
             throw new JoiningMailException();
         }
     }
@@ -276,11 +108,38 @@ public class MemberService {
     }
 
     private void sendCertifyNumMail(String uEmail, String domain, String certifyNum) {
-        mail(CERTIFY_NUMBER_IS, null, uEmail, domain, certifyNum);
+        mail(CERTIFY_NUMBER_IS, EMPTY_STRING, uEmail, domain, certifyNum);
     }
 
-    private Boolean isEqualCacheValue(String key, String value) {
-        return cacheManager.compare(key, value);
+    private void mail(String header, String memberName, String uEmail, String collegeDomain, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(uEmail + collegeDomain);
+
+        if (!memberName.equals(EMPTY_STRING)) {
+            memberName += "님의 ";
+        }
+        message.setSubject("[JoA] " + memberName + header + "를 확인하세요.");
+        message.setText(memberName + header + "는 " + content + " 입니다.");
+        javaMailSender.send(message);
+    }
+
+    public void verifyCertifyNum(VerifyCertifyNumRequest request) {
+        Long sessionId = request.getId();
+        validateSession(CERTIFY_NUMBER, sessionId);
+        verify(sessionId, request.getCertifyNum());
+        cacheEmailOnly(sessionId);
+    }
+
+    private void validateSession(String key, Long sessionId) {
+        if (!cacheManager.isNotExistedKey(key + sessionId)) {
+            throw new MailNotVerifyException();
+        }
+    }
+
+    private void verify(Long sessionId, String certifyNum) {
+        if (!cacheManager.compare(CERTIFY_NUMBER + sessionId, certifyNum)) {
+            throw new InvalidCertifyNumberException();
+        }
     }
 
     private void cacheEmailOnly(Long sessionId) {
@@ -289,33 +148,34 @@ public class MemberService {
         cacheManager.add(AFTER_EMAIL + sessionId, Email, AFTER_CERTIFY_TIME);
     }
 
-    private boolean isNotValidLoginId(String id) {
+    public void verifyId(Long sessionId, String loginId) {
+        validateLoginId(loginId);
+        validateSession(AFTER_EMAIL, sessionId);
+        checkExistedLoginId(sessionId, loginId);
+        cacheLoginId(sessionId, loginId);
+    }
+
+    private void validateLoginId(String id) {
         if (id.length() < 5 || id.length() > 20) {
-            return true;
+            throw new InvalidLoginIdException();
         }
         String regex = "^[a-z0-9-_]+$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
-        return !matcher.matches();
+        if(!matcher.matches()){
+            throw new InvalidLoginIdException();
+        }
     }
 
-    private boolean isNotExistedCacheKey(String key) {
-        return cacheManager.isNotExistedKey(key);
-    }
+    private void checkExistedLoginId(Long sessionId, String loginId) {
+        memberRepository.findByloginId(loginId).ifPresent(existingMember -> {
+            throw new LoginIdAlreadyExistedException();});
 
-    private static boolean isNotValidPassword(String password) {
-        String pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=]).{8,16}$";
-        Pattern regexPattern = Pattern.compile(pattern);
-        Matcher matcher = regexPattern.matcher(password);
-        return !matcher.matches();
-    }
-
-    private Boolean isMyJoiningId(Long sessionId, String loginId) {
-        return cacheManager.compare(ID + sessionId, loginId);
-    }
-
-    private Boolean isCachedLoginId(String loginId) {
-        return cacheManager.isExistedValue(ID, loginId);
+        if (cacheManager.isExistedValue(ID, loginId)) {
+            if(!cacheManager.compare(ID + sessionId, loginId)) {
+                throw new LoginIdAlreadyExistedException();
+            }
+        }
     }
 
     private void cacheLoginId(Long sessionId, String loginId) {
@@ -323,24 +183,72 @@ public class MemberService {
         cacheManager.changeTime(AFTER_EMAIL + sessionId, AFTER_SAVE_LOGIN_ID_TIME);
     }
 
-    private Boolean isNotCachedLoginId(Long sessionId, String loginId) {
-        return !cacheManager.compare(ID + sessionId, loginId);
+    @Transactional
+    public void join(JoinRequest request) {
+        validatePassword(request.getPassword());
+        Long sessionId = request.getId();
+        validateSession(AFTER_EMAIL, sessionId);
+        checkNotCachedLoginId(sessionId, request.getLoginId());
+
+        String eMail = cacheManager.getData(AFTER_EMAIL + sessionId);
+        String[] splitEMail = eMail.split(EMAIL_SPLIT);
+        String uEmail = splitEMail[0];
+        MCollege mCollege = findByDomain(splitEMail[1]);
+        PCollege pCollege = findByPCollegeId(mCollege.getId());
+        checkForbiddenMail(uEmail, mCollege);
+
+        Member joinMember = createMember(request, uEmail, mCollege);
+        createLocation(joinMember, pCollege);
+        emptyCache(sessionId);
+    }
+
+    private static void validatePassword(String password) {
+        String pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=]).{8,16}$";
+        Pattern regexPattern = Pattern.compile(pattern);
+        Matcher matcher = regexPattern.matcher(password);
+        if (!matcher.matches()) {
+            throw new InvalidPasswordException();
+        }
+    }
+
+    private void checkNotCachedLoginId(Long sessionId, String loginId) {
+        if(!cacheManager.compare(ID + sessionId, loginId)){
+            throw new LoginIdNotAuthorizedException();
+        }
     }
 
     private MCollege findByDomain(String domain) {
-        return mCollegeRepository.findBydomain(EMAIL_SPLIT + domain).orElse(null);
+        return mCollegeRepository.findBydomain(EMAIL_SPLIT + domain).orElseThrow(CollegeNotFoundException::new);
     }
 
     private PCollege findByPCollegeId(Long collegeId) {
         return pCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
     }
 
-    private boolean isForbiddenMail(String uEmail, MCollege mCollege) {
-        Optional<Member> forbiddenMember = memberRepository.findForbiddenMember(uEmail, mCollege);
-        if (forbiddenMember.isPresent()) {
-            return true;
-        }
-        return false;
+    private void checkForbiddenMail(String uEmail, MCollege mCollege) {
+        memberRepository.findForbiddenMember(uEmail, mCollege)
+                .ifPresent(forbiddenMember -> {
+                    throw new MailForbiddenException();});
+    }
+
+    private Member createMember(JoinRequest request, String uEmail, MCollege mCollege) {
+        String salt = BCrypt.gensalt();
+        String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
+
+        Member joinMember = Member.builder().name(request.getName())
+                                    .loginId(request.getLoginId())
+                                    .password(hashedPassword)
+                                    .salt(salt)
+                                    .uEmail(uEmail)
+                                    .college(mCollege)
+                                    .sessionId(request.getId()).build();
+        memberRepository.save(joinMember);
+        return joinMember;
+    }
+
+    private void createLocation(Member joinMember, PCollege pCollege) {
+        Location joinLocation = new Location(joinMember.getId(), pCollege);
+        locationRepository.save(joinLocation);
     }
 
     private void emptyCache(Long sessionId) {
@@ -348,22 +256,51 @@ public class MemberService {
         cacheManager.delete(AFTER_EMAIL + sessionId);
     }
 
-    private void mail(String header, String memberName, String uEmail, String collegeDomain, String content) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(uEmail + collegeDomain);
+    @Transactional
+    public SessionIdResponse login(LoginRequest request) {
+        Member findMember = memberChecker.findByLoginId(request.getLoginId());
+        findMember.makeSessionId(sessionManager.makeSessionId());
+        String hashedPassword = BCrypt.hashpw(request.getPassword(), findMember.getSalt());
 
-        if (isNull(memberName)) {
-            message.setSubject("[JoA] " + header + "를 확인하세요.");
-            message.setText(header + "는 " + content + " 입니다.");
-        } else {
-            message.setSubject("[JoA] " + memberName + "님의 " + header + "를 확인하세요.");
-            message.setText(memberName + "님의 " + header + "는 " + content + " 입니다.");
-        }
-        javaMailSender.send(message);
+        compare(findMember.getPassword(), hashedPassword);
+        return SessionIdResponse.of(findMember.getSessionId());
     }
 
-    private Boolean isExistedInCache(String startwith, String checkValue) {
-        return cacheManager.isExistedValue(startwith, checkValue);
+    private void compare(String password, String hashedPassword) {
+        if (!password.equals(hashedPassword)) {
+            throw new PasswordNotFoundException();
+        }
+    }
+
+    @Transactional
+    public void logout(Long sessionId) {
+        Member findMember = memberChecker.findBySessionId(sessionId);
+        locationRepository.findById(findMember.getId())
+                .ifPresent(location -> {
+                    locationRepository.save(new Location(location.getId(), location.getCollege(),
+                                            location.getPoint(), false, location.getUpdateDate()));});
+        findMember.expireSessionId();
+    }
+
+    public void findId(FindIdRequest request) {
+        MCollege college = findByMCollegeId(request.getCollegeId());
+
+        Member member = memberRepository.findByuEmailAndcollege(request.getUEmail(), college)
+                .orElseThrow(MemberNotFoundException::new);
+
+        mail(USER_ID_IS, member.getName(), member.getUEmail(), college.getDomain(), member.getLoginId());
+    }
+
+    @Transactional
+    public void findPassword(FindPasswordRequest request) {
+        Member member = memberChecker.findByLoginId(request.getLoginId());
+
+        String randomPassword = randomPassword();
+        String hashedRandomPassword = BCrypt.hashpw(randomPassword, member.getSalt());
+
+        mail(TEMPORARY_PASSWORD_IS, member.getName(), member.getUEmail(),
+                member.getCollege().getDomain(), randomPassword);
+        member.changePassword(hashedRandomPassword);
     }
 
     private String randomPassword() {
@@ -385,14 +322,31 @@ public class MemberService {
         return builder.toString();
     }
 
-    private Member findByUEmailAndCollege(String uEmail, MCollege college) {
-        return memberRepository.findByuEmailAndcollege(uEmail, college).orElse(null);
+    @Transactional
+    public void transPassword(TransPasswordRequest request) {
+        Member findMember = memberChecker.findBySessionId(request.getId());
+
+        String hashedCurrentPassword = BCrypt.hashpw(request.getCurrentPassword(), findMember.getSalt());
+        if (findMember.getPassword().equals(hashedCurrentPassword)) {
+            validatePassword(request.getNewPassword());
+            String hashedNewPassword = BCrypt.hashpw(request.getNewPassword(), findMember.getSalt());
+            findMember.changePassword(hashedNewPassword);
+            return;
+        }
+        throw new PasswordNotFoundException();
     }
 
-    private void checkExistedLoginId(String loginId) {
-        Optional<Member> member = memberRepository.findByloginId(loginId);
-        if (member.isPresent()) {
-            throw new LoginIdAlreadyExistedException();
+    @Transactional
+    public void withdrawal(Long sessionId) {
+        Member member = memberChecker.findBySessionId(sessionId);
+
+        if (s3Uploader.deletePicture(member.getUrlCode())) {
+            locationRepository.deleteById(member.getId());
+            member.expireSessionId();
+            member.changeWithdrawal(true);
+            member.changeUrlCode(EMPTY_STRING);
+            return;
         }
+        throw new S3InvalidException();
     }
 }
