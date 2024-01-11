@@ -45,8 +45,8 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'build/libs/JProject-0.0.1-SNAPSHOT.jar'
-          target: '/path/to/nginx/html/'
+          source: 'build/libs/*'
+          target: '/home/ubuntu/JoA-2023/JProject-0.0.1-SNAPSHOT.jar'
 
       - name: Restart Application
         uses: appleboy/ssh-action@master
