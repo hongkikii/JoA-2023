@@ -46,7 +46,7 @@ jobs:
           username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: 'build/libs/*'
-          target: '/home/ubuntu/JoA-2023/JProject-0.0.1-SNAPSHOT.jar'
+          target: '/home/ubuntu/JoA-2023/JoA.jar'
 
       - name: Restart Application
         uses: appleboy/ssh-action@master
@@ -54,4 +54,4 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: 'sudo systemctl restart JProject'
+          script: 'sudo systemctl restart JoA'
