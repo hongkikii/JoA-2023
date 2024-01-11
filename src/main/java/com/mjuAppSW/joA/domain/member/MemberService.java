@@ -278,8 +278,7 @@ public class MemberService {
         locationRepository.findById(findMember.getId())
                 .ifPresent(location -> {
                     locationRepository.save(new Location(location.getId(), location.getCollege(),
-                            location.getPoint(), false, location.getUpdateDate()));
-                });
+                                            location.getPoint(), false, location.getUpdateDate()));});
         findMember.expireSessionId();
     }
 
