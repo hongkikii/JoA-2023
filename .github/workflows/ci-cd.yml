@@ -54,4 +54,7 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: 'sudo systemctl restart JoA'
+          script: |
+            cd /home/ubuntu/JoA-2023/
+            pkill -f "java -jar JoA.jar"
+            nohup java -jar JoA.jar &
