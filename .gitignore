@@ -44,3 +44,6 @@ out/
 application-dev.yml
 application.yml
 .DS_Store
+
+# Init data
+src/main/java/com/mjuAppSW/joA/common/data/
