@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -45,21 +46,12 @@ public class VoteService {
         checkInvalidVote(giveMemberId, takeMemberId);
         checkBlock(giveMemberId, takeMemberId);
 
-        Vote vote = makeVote(giveMember, takeMember, voteCategory, request.getHint());
-        voteRepository.save(vote);
-    }
-
-    public VoteListResponse getVotes(Long sessionId) {
-        Member findTakeMember = memberChecker.findBySessionId(sessionId);
-        return VoteListResponse.of(getVoteList(findTakeMember.getId()));
-    }
-
-    public VoteOwnerResponse getVoteOwner(Long sessionId) {
-        return VoteOwnerResponse.of(memberChecker.findBySessionId(sessionId));
+        createVote(giveMember, takeMember, voteCategory, request.getHint());
     }
 
     private VoteCategory findVoteCategoryById(Long id) {
-        return voteCategoryRepository.findById(id).orElseThrow(VoteCategoryNotFoundException::new);
+        return voteCategoryRepository.findById(id)
+                .orElseThrow(VoteCategoryNotFoundException::new);
     }
 
     private void checkEqualVote(Long giveId, Long takeId, Long categoryId) {
@@ -68,39 +60,31 @@ public class VoteService {
     }
 
     private void checkInvalidVote(Long giveId, Long takeId) {
-        if (!voteRepository.findInvalidVotes(giveId, takeId).isEmpty()) {
+        if (voteRepository.findInvalidVotes(giveId, takeId).size() != 0) {
             throw new AccessForbiddenException();
         }
     }
 
-    private void checkBlock(Long giveId, Long takeId) {
-        if (!blockRepository.findBlockByIds(giveId, takeId).isEmpty()) {
-            throw new BlockAccessForbiddenException();
-        }
+    private void createVote(Member giveMember, Member takeMember, VoteCategory voteCategory, String hint) {
+        voteRepository.save(Vote.builder()
+                            .giveId(giveMember.getId())
+                            .member(takeMember)
+                            .voteCategory(voteCategory)
+                            .date(LocalDate.now())
+                            .hint(hint)
+                            .build());
     }
 
-    private Vote makeVote(Member giveMember, Member takeMember, VoteCategory voteCategory, String hint) {
-        return Vote.builder()
-                .giveId(giveMember.getId())
-                .member(takeMember)
-                .voteCategory(voteCategory)
-                .date(LocalDate.now())
-                .hint(hint)
-                .build();
+    public VoteListResponse getVotes(Long sessionId) {
+        Member findTakeMember = memberChecker.findBySessionId(sessionId);
+        return VoteListResponse.of(getVoteList(findTakeMember.getId()));
     }
 
     private List<VoteContent> getVoteList(Long id) {
-        List<VoteContent> voteList = new ArrayList<>();
         Pageable pageable = PageRequest.of(0, 30);
-        List<Vote> votes = findVotesByTakeId(id, pageable);
-        for (Vote vote : votes) {
-            voteList.add(makeVoteContent(vote));
-        }
-        return voteList;
-    }
-
-    private List<Vote> findVotesByTakeId(Long id, Pageable pageable) {
-        return voteRepository.findValidAllByTakeId(id, pageable);
+        return findVotesByTakeId(id, pageable).stream()
+                                            .map(this::makeVoteContent)
+                                            .collect(Collectors.toList());
     }
 
     private VoteContent makeVoteContent(Vote vote) {
@@ -109,5 +93,19 @@ public class VoteService {
                         .categoryId(vote.getVoteCategory().getId())
                         .hint(vote.getHint())
                         .build();
+    }
+
+    public VoteOwnerResponse getVoteOwner(Long sessionId) {
+        return VoteOwnerResponse.of(memberChecker.findBySessionId(sessionId));
+    }
+
+    private void checkBlock(Long giveId, Long takeId) {
+        if (blockRepository.findBlockByIds(giveId, takeId).size() != 0) {
+            throw new BlockAccessForbiddenException();
+        }
+    }
+
+    private List<Vote> findVotesByTakeId(Long id, Pageable pageable) {
+        return voteRepository.findValidAllByTakeId(id, pageable);
     }
 }
