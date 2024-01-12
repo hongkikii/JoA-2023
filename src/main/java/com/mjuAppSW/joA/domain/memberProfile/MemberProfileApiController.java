@@ -86,7 +86,8 @@ public class MemberProfileApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
+            @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다."),
+            @ApiResponse(responseCode = "500", description = "M003: S3 저장소 접근에 실패했습니다.")
     })
     @PatchMapping("/picture")
     public ResponseEntity<SuccessResponse<Void>> transPicture(@RequestBody @Valid PictureRequest request) {
@@ -98,7 +99,8 @@ public class MemberProfileApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
             @ApiResponse(responseCode = "404", description = "M001: 사용자를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다.")
+            @ApiResponse(responseCode = "403", description = "M002: 접근 권한이 없는 계정입니다."),
+            @ApiResponse(responseCode = "500", description = "M003: S3 저장소 접근에 실패했습니다.")
     })
     @PatchMapping("/{id}/picture")
     public ResponseEntity<Void> deletePicture(

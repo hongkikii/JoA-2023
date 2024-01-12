@@ -23,7 +23,7 @@ public class Constants {
         public static String ERROR = "error";
     }
 
-    public static Integer NORMAL_OPERATION = 0;
+    public static Integer ZERO = 0;
     public static String EMPTY_STRING = "";
     public static String EMAIL_SPLIT = "@";
 }

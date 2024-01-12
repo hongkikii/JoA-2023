@@ -21,13 +21,13 @@ public class PCollegeApiController {
 
     private final PCollegeService pCollegeService;
 
-    @Operation(summary = "학교 범위 등록", description = "학교 범위 등록 API")
+    @Operation(summary = "학교 생성", description = "학교 생성(범위 포함) API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상태 코드 반환"),
     })
     @PostMapping
-    public ResponseEntity<Void> setPolygon(@RequestBody @Valid PolygonRequest request) {
-        pCollegeService.setPolygon(request);
+    public ResponseEntity<Void> create(@RequestBody @Valid PolygonRequest request) {
+        pCollegeService.create(request);
         return ResponseEntity.ok().build();
     }
 }

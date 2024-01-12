@@ -13,12 +13,11 @@ import org.locationtech.jts.geom.Polygon;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PCollege {
-
     @Id
     @Column(name = "College_id")
     private Long collegeId;
 
-    @Column(name = "Polygon_field", columnDefinition = "geometry(Polygon,4326)")
+    @Column(name = "Polygon_field", columnDefinition = "geometry(Polygon,4326)", nullable = false)
     private Polygon polygonField;
 
     public PCollege(Long collegeId, Polygon polygonField) {

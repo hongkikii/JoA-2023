@@ -43,9 +43,4 @@ out/
 # Setting file
 application-dev.yml
 application.yml
-/src/main/resources/import.sql
 .DS_Store
-
-# Log
-/logs-dev
-/logs-prod

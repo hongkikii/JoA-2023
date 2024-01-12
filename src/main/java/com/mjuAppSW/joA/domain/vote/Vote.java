@@ -37,7 +37,7 @@ public class Vote {
     private VoteCategory voteCategory;
 
     @Column(nullable = false)
-    private LocalDate date; // 변환 방법 알아봐야
+    private LocalDate date;
 
     private String hint;
 

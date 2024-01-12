@@ -15,9 +15,8 @@ public class PCollegeService {
     private final PCollegeRepository pCollegeRepository;
 
     @Transactional
-    public void setPolygon(PolygonRequest request) {
-        Polygon polygon = makePolygon(request);
-        PCollege college = new PCollege(request.getCollegeId(), polygon);
+    public void create(PolygonRequest request) {
+        PCollege college = new PCollege(request.getCollegeId(), makePolygon(request));
         pCollegeRepository.save(college);
     }
 

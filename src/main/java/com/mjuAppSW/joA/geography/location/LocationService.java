@@ -1,11 +1,6 @@
 package com.mjuAppSW.joA.geography.location;
 
-import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
-import static java.util.Objects.isNull;
-
 import com.mjuAppSW.joA.common.auth.MemberChecker;
-import com.mjuAppSW.joA.domain.heart.Heart;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.geography.block.exception.LocationNotFoundException;
@@ -20,7 +15,6 @@ import com.mjuAppSW.joA.geography.location.exception.CollegeNotFoundException;
 import com.mjuAppSW.joA.geography.location.exception.OutOfCollegeException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -45,45 +39,46 @@ public class LocationService {
     @Transactional
     public UpdateResponse updateLocation(UpdateRequest request) {
         Member member = memberChecker.findBySessionId(request.getId());
-        Location location = findLocationById(member.getId());
-        PCollege college = findCollegeById(location.getCollege().getCollegeId());
+        Location oldLocation = findLocation(member.getId());
+        PCollege college = findCollege(oldLocation.getCollege().getCollegeId());
 
         memberChecker.checkStopped(member);
 
-        boolean isContained = isPointWithinPolygon
+        boolean isContained = isPointWithinCollege
                 (request.getLatitude(), request.getLongitude(), college.getPolygonField());
 
-        Point point = getPoint(request.getLatitude(), request.getLongitude(), request.getAltitude());
-        Location newLocation = new Location(location.getId(), location.getCollege(), point, isContained, LocalDate.now());
-        locationRepository.save(newLocation);
+        createLocation(request, oldLocation, isContained);
         return UpdateResponse.of(isContained);
     }
 
-    public NearByListResponse getNearByList(Long sessionId, Double latitude, Double longitude, Double altitude) {
-        Member member = memberChecker.findBySessionId(sessionId);
-        memberChecker.checkStopped(member);
-
-        Location location = findLocationById(member.getId());
-
-        checkWithinCollege(location);
-
-        Point point = getPoint(latitude, longitude, altitude);
-        List<Long> nearMemberIds = findNearIds(member.getId(), point, member.getCollege().getId());
-        List<NearByInfo> nearByList = makeNearByList(member, nearMemberIds);
-        return NearByListResponse.of(nearByList);
+    private Location findLocation(Long memberId) {
+        return locationRepository.findById(memberId)
+                .orElseThrow(LocationNotFoundException::new);
     }
 
-    public OwnerResponse getOwner(Long sessionId) {
-        Member findMember = memberChecker.findBySessionId(sessionId);
-        return OwnerResponse.of(findMember);
+    private PCollege findCollege(Long memberId) {
+        return pCollegeRepository.findById(memberId)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
-    private Location findLocationById(Long id) {
-        return locationRepository.findById(id).orElseThrow(LocationNotFoundException::new);
+    private boolean isPointWithinCollege(double latitude, double longitude, Polygon polygon) {
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        Coordinate coordinate = new Coordinate(longitude, latitude);
+        Point point = geometryFactory.createPoint(coordinate);
+
+        return polygon.contains(point);
     }
 
-    private PCollege findCollegeById(Long id) {
-        return pCollegeRepository.findById(id).orElseThrow(CollegeNotFoundException::new);
+    private void createLocation(UpdateRequest request, Location oldLocation, boolean isContained) {
+        Point point = getPoint(request.getLatitude(), request.getLongitude(), request.getAltitude());
+        Location newLocation = Location.builder()
+                                    .id(oldLocation.getId())
+                                    .college(oldLocation.getCollege())
+                                    .point(point)
+                                    .isContained(isContained)
+                                    .updateDate(LocalDate.now())
+                                    .build();
+        locationRepository.save(newLocation);
     }
 
     private Point getPoint(double latitude, double longitude, double altitude) {
@@ -92,12 +87,16 @@ public class LocationService {
         return geometryFactory.createPoint(coordinate);
     }
 
-    private Boolean isPointWithinPolygon(double latitude, double longitude, Polygon polygon) {
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-        Coordinate coordinate = new Coordinate(longitude, latitude);
-        Point point = geometryFactory.createPoint(coordinate);
+    public NearByListResponse getNearByList(Long sessionId, Double latitude, Double longitude, Double altitude) {
+        Member member = memberChecker.findBySessionId(sessionId);
+        memberChecker.checkStopped(member);
+        checkWithinCollege(findLocation(member.getId()));
 
-        return polygon.contains(point);
+        Point point = getPoint(latitude, longitude, altitude);
+        List<Long> nearMemberIds = locationRepository.findNearIds(member.getId(), point,
+                                                                member.getCollege().getId(), LocalDate.now());
+        List<NearByInfo> nearByList = makeNearByList(member, nearMemberIds);
+        return NearByListResponse.of(nearByList);
     }
 
     private void checkWithinCollege(Location location) {
@@ -106,29 +105,27 @@ public class LocationService {
         }
     }
 
-    private List<Long> findNearIds(Long id, Point point, Long collegeId) {
-        return locationRepository.findNearIds(id, point, collegeId, LocalDate.now());
-    }
-
     private List<NearByInfo> makeNearByList(Member member, List<Long> nearMemberIds) {
-        List<NearByInfo> nearByList = nearMemberIds.stream()
-                .map(nearId -> {
-                    Member findMember = memberChecker.findById(nearId);
-                    boolean isLiked = isEqualHeartExisted(member.getId(), nearId);
-                    return NearByInfo.builder()
-                            .id(findMember.getId())
-                            .name(findMember.getName())
-                            .urlCode(findMember.getUrlCode())
-                            .bio(findMember.getBio())
-                            .isLiked(isLiked)
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        return nearByList;
+        return nearMemberIds.stream()
+                        .map(nearId -> {
+                            Member findMember = memberChecker.findById(nearId);
+                            boolean isLiked = isEqualHeartExisted(member.getId(), nearId);
+                            return NearByInfo.builder()
+                                        .id(findMember.getId())
+                                        .name(findMember.getName())
+                                        .urlCode(findMember.getUrlCode())
+                                        .bio(findMember.getBio())
+                                        .isLiked(isLiked)
+                                        .build();})
+                        .collect(Collectors.toList());
     }
 
     private Boolean isEqualHeartExisted(Long giveId, Long takeId) {
-        return heartRepository.findEqualHeart(LocalDate.now(), giveId, takeId).isPresent();
+        return heartRepository.findEqualHeart(LocalDate.now(), giveId, takeId)
+                .isPresent();
+    }
+
+    public OwnerResponse getOwner(Long sessionId) {
+        return OwnerResponse.of(memberChecker.findBySessionId(sessionId));
     }
 }

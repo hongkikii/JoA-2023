@@ -34,9 +34,8 @@ import com.mjuAppSW.joA.domain.member.exception.MailForbiddenException;
 import com.mjuAppSW.joA.domain.member.exception.MailNotVerifyException;
 import com.mjuAppSW.joA.domain.member.exception.MemberAlreadyExistedException;
 import com.mjuAppSW.joA.domain.member.exception.PasswordNotFoundException;
-import com.mjuAppSW.joA.domain.member.exception.SessionNotFoundException;
 import com.mjuAppSW.joA.domain.memberProfile.exception.MemberNotFoundException;
-import com.mjuAppSW.joA.domain.memberProfile.exception.S3InvalidException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.InvalidS3Exception;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
 import com.mjuAppSW.joA.geography.location.Location;
@@ -86,7 +85,8 @@ public class MemberService {
     }
 
     private MCollege findByMCollegeId(Long collegeId) {
-        return mCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
+        return mCollegeRepository.findById(collegeId)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
     private void checkExistedMember(String uEmail, MCollege college) {
@@ -218,11 +218,13 @@ public class MemberService {
     }
 
     private MCollege findByDomain(String domain) {
-        return mCollegeRepository.findBydomain(EMAIL_SPLIT + domain).orElseThrow(CollegeNotFoundException::new);
+        return mCollegeRepository.findBydomain(EMAIL_SPLIT + domain)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
     private PCollege findByPCollegeId(Long collegeId) {
-        return pCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
+        return pCollegeRepository.findById(collegeId)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
     private void checkForbiddenMail(String uEmail, MCollege mCollege) {
@@ -277,8 +279,11 @@ public class MemberService {
         Member findMember = memberChecker.findBySessionId(sessionId);
         locationRepository.findById(findMember.getId())
                 .ifPresent(location -> {
-                    locationRepository.save(new Location(location.getId(), location.getCollege(),
-                                            location.getPoint(), false, location.getUpdateDate()));});
+                    locationRepository.save(Location.builder().id(location.getId())
+                                                        .college(location.getCollege())
+                                                        .point(location.getPoint())
+                                                        .isContained(false)
+                                                        .updateDate(location.getUpdateDate()).build());});
         findMember.expireSessionId();
     }
 
@@ -347,6 +352,6 @@ public class MemberService {
             member.changeUrlCode(EMPTY_STRING);
             return;
         }
-        throw new S3InvalidException();
+        throw new InvalidS3Exception();
     }
 }
