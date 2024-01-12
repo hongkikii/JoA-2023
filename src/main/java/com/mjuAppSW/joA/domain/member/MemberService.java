@@ -86,7 +86,8 @@ public class MemberService {
     }
 
     private MCollege findByMCollegeId(Long collegeId) {
-        return mCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
+        return mCollegeRepository.findById(collegeId)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
     private void checkExistedMember(String uEmail, MCollege college) {
@@ -218,11 +219,13 @@ public class MemberService {
     }
 
     private MCollege findByDomain(String domain) {
-        return mCollegeRepository.findBydomain(EMAIL_SPLIT + domain).orElseThrow(CollegeNotFoundException::new);
+        return mCollegeRepository.findBydomain(EMAIL_SPLIT + domain)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
     private PCollege findByPCollegeId(Long collegeId) {
-        return pCollegeRepository.findById(collegeId).orElseThrow(CollegeNotFoundException::new);
+        return pCollegeRepository.findById(collegeId)
+                .orElseThrow(CollegeNotFoundException::new);
     }
 
     private void checkForbiddenMail(String uEmail, MCollege mCollege) {
@@ -277,8 +280,11 @@ public class MemberService {
         Member findMember = memberChecker.findBySessionId(sessionId);
         locationRepository.findById(findMember.getId())
                 .ifPresent(location -> {
-                    locationRepository.save(new Location(location.getId(), location.getCollege(),
-                                            location.getPoint(), false, location.getUpdateDate()));});
+                    locationRepository.save(Location.builder().id(location.getId())
+                                                        .college(location.getCollege())
+                                                        .point(location.getPoint())
+                                                        .isContained(false)
+                                                        .updateDate(location.getUpdateDate()).build());});
         findMember.expireSessionId();
     }
 
