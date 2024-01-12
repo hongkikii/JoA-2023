@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -40,6 +41,7 @@ public class Location {
         this.isContained = false;
     }
 
+    @Builder
     public Location(Long id, PCollege college, Point point, Boolean isContained, LocalDate updateDate) {
         this.id = id;
         this.college = college;
