@@ -34,9 +34,8 @@ import com.mjuAppSW.joA.domain.member.exception.MailForbiddenException;
 import com.mjuAppSW.joA.domain.member.exception.MailNotVerifyException;
 import com.mjuAppSW.joA.domain.member.exception.MemberAlreadyExistedException;
 import com.mjuAppSW.joA.domain.member.exception.PasswordNotFoundException;
-import com.mjuAppSW.joA.domain.member.exception.SessionNotFoundException;
 import com.mjuAppSW.joA.domain.memberProfile.exception.MemberNotFoundException;
-import com.mjuAppSW.joA.domain.memberProfile.exception.S3InvalidException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.InvalidS3Exception;
 import com.mjuAppSW.joA.geography.college.PCollege;
 import com.mjuAppSW.joA.geography.college.PCollegeRepository;
 import com.mjuAppSW.joA.geography.location.Location;
@@ -353,6 +352,6 @@ public class MemberService {
             member.changeUrlCode(EMPTY_STRING);
             return;
         }
-        throw new S3InvalidException();
+        throw new InvalidS3Exception();
     }
 }

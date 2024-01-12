@@ -1,5 +1,8 @@
 package com.mjuAppSW.joA.domain.member;
 
+import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
+import static com.mjuAppSW.joA.common.constant.Constants.ZERO;
+
 import com.mjuAppSW.joA.domain.college.MCollege;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,22 +32,25 @@ public class Member {
     @Column(name = "Login_id", nullable = false)
     private String loginId;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String salt;
 
-    @Column(name = "U_email")
+    @Column(name = "U_email", nullable = false)
     private String uEmail;
 
-    @Column(length = 15)
+    @Column(length = 15, nullable = false)
     private String bio;
 
-    @Column(name = "Url_code")
+    @Column(name = "Url_code", nullable = false)
     private String urlCode;
 
+    @Column(nullable = false)
     private Boolean isWithdrawal;
 
-    @Column(name = "Session_id")
+    @Column(name = "Session_id", nullable = false)
     private Long sessionId;
 
     @ManyToOne
@@ -70,11 +76,11 @@ public class Member {
         this.uEmail = uEmail;
         this.college = college;
         this.isWithdrawal = false;
-        this.bio = "";
-        this.urlCode = "";
+        this.bio = EMPTY_STRING;
+        this.urlCode = EMPTY_STRING;
         this.sessionId = sessionId;
-        this.reportCount = 0;
-        this.status = 0;
+        this.reportCount = ZERO;
+        this.status = ZERO;
     }
 
     public void changeUrlCode(String urlCode) {

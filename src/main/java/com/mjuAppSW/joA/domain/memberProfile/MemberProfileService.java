@@ -10,7 +10,7 @@ import com.mjuAppSW.joA.domain.memberProfile.dto.request.BioRequest;
 import com.mjuAppSW.joA.domain.memberProfile.dto.response.MyPageResponse;
 import com.mjuAppSW.joA.domain.memberProfile.dto.request.PictureRequest;
 import com.mjuAppSW.joA.domain.memberProfile.dto.response.SettingPageResponse;
-import com.mjuAppSW.joA.domain.memberProfile.exception.S3InvalidException;
+import com.mjuAppSW.joA.domain.memberProfile.exception.InvalidS3Exception;
 import com.mjuAppSW.joA.domain.vote.VoteRepository;
 import com.mjuAppSW.joA.common.storage.S3Uploader;
 import jakarta.transaction.Transactional;
@@ -60,28 +60,33 @@ public class MemberProfileService {
     public void transPicture(PictureRequest request) {
         Member member = memberChecker.findBySessionId(request.getId());
 
-        if (!isBasicImage(member.getUrlCode()))
+        if (!isBasic(member.getUrlCode())){
             s3Uploader.deletePicture(member.getUrlCode());
-
+        }
         String newUrlCode = s3Uploader.putPicture(member.getId(), request.getBase64Picture());
-        if(newUrlCode.equals(ERROR))
-            throw new S3InvalidException();
-
+        if(newUrlCode.equals(ERROR)) {
+            throw new InvalidS3Exception();
+        }
         member.changeUrlCode(newUrlCode);
+    }
+
+    private boolean isBasic(String urlCode) {
+        if(urlCode.equals(EMPTY_STRING)) {
+            return true;
+        }
+        return false;
     }
 
     @Transactional
     public void deletePicture(Long sessionId) {
         Member member = memberChecker.findBySessionId(sessionId);
-        if(isBasicImage(member.getUrlCode())) return;
-
-        s3Uploader.deletePicture(member.getUrlCode());
-        member.changeUrlCode(EMPTY_STRING);
-    }
-
-    private boolean isBasicImage(String urlCode) {
-        if(urlCode.equals(EMPTY_STRING))
-            return true;
-        return false;
+        if(isBasic(member.getUrlCode())) {
+            return;
+        }
+        if (s3Uploader.deletePicture(member.getUrlCode())) {
+            member.changeUrlCode(EMPTY_STRING);
+            return;
+        }
+        throw new InvalidS3Exception();
     }
 }
