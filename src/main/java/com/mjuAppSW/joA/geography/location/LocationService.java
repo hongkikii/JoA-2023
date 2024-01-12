@@ -1,11 +1,6 @@
 package com.mjuAppSW.joA.geography.location;
 
-import static com.mjuAppSW.joA.common.constant.Constants.EMPTY_STRING;
-import static com.mjuAppSW.joA.common.constant.Constants.NORMAL_OPERATION;
-import static java.util.Objects.isNull;
-
 import com.mjuAppSW.joA.common.auth.MemberChecker;
-import com.mjuAppSW.joA.domain.heart.Heart;
 import com.mjuAppSW.joA.domain.heart.HeartRepository;
 import com.mjuAppSW.joA.domain.member.Member;
 import com.mjuAppSW.joA.geography.block.exception.LocationNotFoundException;
@@ -20,7 +15,6 @@ import com.mjuAppSW.joA.geography.location.exception.CollegeNotFoundException;
 import com.mjuAppSW.joA.geography.location.exception.OutOfCollegeException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
