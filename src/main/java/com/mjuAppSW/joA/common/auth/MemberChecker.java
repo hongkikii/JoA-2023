@@ -16,7 +16,8 @@ public class MemberChecker {
     private final MemberRepository memberRepository;
 
     public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
+        return memberRepository.findById(id)
+                .orElseThrow(MemberNotFoundException::new);
     }
 
     public Member findBySessionId(Long sessionId) {

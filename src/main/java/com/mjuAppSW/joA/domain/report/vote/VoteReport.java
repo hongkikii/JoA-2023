@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +38,7 @@ public class VoteReport {
     @Column(nullable = false)
     private LocalDateTime date;
 
+    @Builder
     public VoteReport(Vote vote, ReportCategory reportCategory, String content, LocalDateTime date) {
         this.vote = vote;
         this.reportCategory = reportCategory;
